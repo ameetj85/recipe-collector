@@ -8,7 +8,11 @@
     "starRating": 4,
     "category": "Indian",
     "type": "Chicken",
-    "images": ["a1.jpg", "a2.jpg", "a3.jpg"],
+    "images": [
+      "chicken-bhuna-1.webp",
+      "chicken-bhuna-1.webp",
+      "chicken-bhuna-1.webp"
+    ],
     "isFeatured": false,
     "createdAt": "2024-01-01T00:00:00.000Z",
     "updatedAt": "2024-01-01T00:00:00.000Z",
@@ -51,7 +55,12 @@
     "starRating": 4,
     "category": "Italian",
     "type": "Vegetarian",
-    "images": ["a1.jpg", "a2.jpg", "a3.jpg"],
+    "images": [
+      "italian-corn-1.webp",
+      "italian-corn-2.webp",
+      "italian-corn-3.webp",
+      "italian-corn-4.webp"
+    ],
     "isFeatured": false,
     "createdAt": "2024-01-01T00:00:00.000Z",
     "updatedAt": "2024-01-01T00:00:00.000Z",
@@ -83,7 +92,7 @@
     "starRating": 5,
     "category": "American",
     "type": "Beef",
-    "images": ["a1.jpg", "a2.jpg", "a3.jpg"],
+    "images": ["meatloaf-1.webp", "meatloaf-2.webp", "meatloaf-3.webp"],
     "isFeatured": false,
     "createdAt": "2024-01-01T00:00:00.000Z",
     "updatedAt": "2024-01-01T00:00:00.000Z",
@@ -131,7 +140,13 @@
     "starRating": 5,
     "category": "Mexican",
     "type": "Fish",
-    "images": ["a1.jpg", "a2.jpg", "a3.jpg"],
+    "images": [
+      "fish-tacos-1.webp",
+      "fish-tacos-2.webp",
+      "fish-tacos-3.webp",
+      "fish-tacos-4.webp",
+      "fish-tacos-5.webp"
+    ],
     "isFeatured": false,
     "createdAt": "2024-01-01T00:00:00.000Z",
     "updatedAt": "2024-01-01T00:00:00.000Z",

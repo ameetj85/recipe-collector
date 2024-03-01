@@ -68,18 +68,18 @@ const Navbar = () => {
                   Home
                 </Link>
                 <Link
-                  href='/properties'
+                  href='/recipes'
                   className={`${
-                    pathname === '/properties' ? 'bg-black' : ''
+                    pathname === '/recipes' ? 'bg-black' : ''
                   } text-white hover:bg-gray-900 hover:text-white rounded-md px-3 py-2`}
                 >
                   Recipes
                 </Link>
                 {isLoggedIn && (
                   <Link
-                    href='/properties/add'
+                    href='/recipes/add'
                     className={`${
-                      pathname === '/properties/add' ? 'bg-black' : ''
+                      pathname === '/recipes/add' ? 'bg-black' : ''
                     } text-white hover:bg-gray-900 hover:text-white rounded-md px-3 py-2`}
                   >
                     Add Recipe
@@ -211,7 +211,7 @@ const Navbar = () => {
             <Link
               href='/recipes'
               className={`${
-                pathname === '/properties' ? 'bg-black' : ''
+                pathname === '/recipes' ? 'bg-black' : ''
               }  text-white block rounded-md px-3 py-2 text-base font-medium`}
             >
               Recipes
@@ -221,7 +221,7 @@ const Navbar = () => {
               <Link
                 href='/recipes/add'
                 className={`${
-                  pathname === '/properties/add' ? 'bg-black' : ''
+                  pathname === '/recipes/add' ? 'bg-black' : ''
                 }  text-white block rounded-md px-3 py-2 text-base font-medium`}
               >
                 Add Recipe
