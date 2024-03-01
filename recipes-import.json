@@ -1,6 +1,5 @@
 [
   {
-    "_id": "1",
     "owner": "1",
     "name": "Chicken Bhuna",
     "description": "Chicken bhuna is an Indian curry with delicious fried onions and aromatic herb and spices that tastes fantastic! Enjoy with freshly cooked basmati rice and naan bread.",
@@ -47,7 +46,6 @@
     "directions": "Heat oil in a nonstick pan over high heat. Add onion and salt; cook and stir until onion has softened, about 5 minutes.\nReduce heat to low; stir in garlic and ginger until fragrant. Add hot water; cover, and cook, stirring occasionally, until water has evaporated, about 5 minutes.\nAdd chili powder, ground coriander, cumin, and turmeric; cook and stir over high heat until spices are toasted, about 5 minutes. Stir in tomatoes and green chiles; cover and cook over low heat for 5 minutes.\nAdd chicken; cook and stir over high heat until browned, 5 to 7 minutes. Stir in curry paste; reduce heat to low, cover and cook until chicken is cooked through, adding a little water if necessary, about 5 minutes. Check seasoning and sprinkle with freshly chopped cilantro."
   },
   {
-    "_id": "2",
     "owner": "1",
     "name": "Irresistible Italian Corn",
     "description": "This is a delicious seasoned corn side dish. DELICIOUS. Must TRY NOW!!",
@@ -84,7 +82,6 @@
     "directions": "Heat a skillet over high heat. Heat butter in hot skillet until almost completely melted; stir in corn. Season corn with Italian seasoning, salt, and black pepper. Cook seasoned corn until light golden brown, about 5 minutes.\n"
   },
   {
-    "_id": "3",
     "owner": "1",
     "name": "Classic Meatloaf",
     "description": "This traditional meatloaf recipe made with sautéed vegetables, spices, and bread crumbs is moist and flavorful and topped with an old-fashioned glaze. Cook time will depend on the size and shape of your loaf, as well as the type of baking pan you use. Serve this hearty meal on cool fall or winter evenings with mashed potatoes and a simple mushroom gravy.",
@@ -130,6 +127,62 @@
       "1 teaspoon Sriracha sauce, or to taste"
     ],
     "directions": "1. Gather all ingredients.\n2.Preheat the oven to 325 degrees F (165 degrees C). Line a baking dish with lightly greased foil.\n3.Place carrot, celery, onion, bell pepper, mushrooms, and garlic in a food processor; pulse until very finely chopped, almost to a purée. Transfer to a large mixing bowl.\n4.Add ground chuck to the vegetables, along with Worcestershire sauce, egg, Italian herbs, salt, black pepper, and cayenne. Mix gently with a wooden spoon until ingredients are just combined. Sprinkle in bread crumbs and gently mix with your fingertips until just combined; don't overmix.\n5.Shape the mixture into a loaf, about 4 inches high by 6 inches across. Place in the prepared baking pan.\n6.Bake in the preheated oven just until the meatloaf is hot, about 15 minutes.\n7.Meanwhile, stir brown sugar, ketchup, Dijon, and Sriracha for glaze in a small bowl until brown sugar has dissolved.\n8.Remove meatloaf from the oven. Spoon glaze on the top of the meatloaf with the back of a spoon, then pull a tiny bit glaze down the sides.\n9.Return to the oven, and bake until no longer pink inside, 45 to 75 more minutes. An instant-read thermometer inserted into the thickest part of the loaf should read at least 160 degrees F (70 degrees C), so start checking at 45 minutes and continue baking until meatloaf reaches that temperature. Cooking time will depend on shape and thickness of the meatloaf.\n10.Serve hot and enjoy!"
+  },
+  {
+    "owner": "1",
+    "name": "Fish Tacos",
+    "description": "These crispy fish tacos with shredded cabbage and a spicy homemade white sauce are just delicious! Serve with homemade pico de gallo and lime wedges to squeeze on top.",
+    "url": "https://www.allrecipes.com/recipe/53729/fish-tacos/",
+    "starRating": 5,
+    "category": "Mexican",
+    "type": "Fish",
+    "images": [
+      "fish-tacos-1.webp",
+      "fish-tacos-2.webp",
+      "fish-tacos-3.webp",
+      "fish-tacos-4.webp",
+      "fish-tacos-5.webp"
+    ],
+    "isFeatured": false,
+    "createdAt": "2024-01-01T00:00:00.000Z",
+    "updatedAt": "2024-01-01T00:00:00.000Z",
+    "prepTime": 40,
+    "cookTime": 20,
+    "totalTime": 60,
+    "servings": 8,
+    "nutritionInfo": {
+      "calories": 409,
+      "fat": 19,
+      "carbs": 43,
+      "protein": 17,
+      "sugars": 0
+    },
+    "ingredients": [
+      "Beer Batter:",
+      "1 cup all-purpose flour",
+      "2 tablespoons cornstarch",
+      "1 teaspoon baking powder",
+      "½ teaspoon salt",
+      "1 cup beer",
+      "1 egg",
+      "White Sauce:",
+      "½ cup plain yogurt",
+      "½ cup mayonnaise",
+      "1 lime, juiced",
+      "1 jalapeno pepper, minced",
+      "1 teaspoon minced capers",
+      "1 teaspoon ground cayenne pepper",
+      "½ teaspoon dried oregano",
+      "½ teaspoon ground cumin",
+      "1/2 dried dill weed",
+      "Fish Tacos:",
+      "1 quart oil for frying",
+      "1 pound cod fillets, cut into 2 to 3 ounce portions",
+      "2 tablespoons all-purpose flour, or more as needed",
+      "1 (12 ounce) package corn tortillas",
+      "½ medium head cabbage, finely shredded"
+    ],
+    "directions": "1.Make beer batter: Combine flour, cornstarch, baking powder, and salt in a large bowl. Blend beer and egg in a separate bowl, then quickly stir into flour mixture until combined with a few lumps remaining.\n2.Make white sauce: Mix together yogurt and mayonnaise in a medium bowl. Gradually stir in fresh lime juice until consistency is slightly runny. Season with jalapeño, capers, cayenne, oregano, cumin, and dill.\n3.Start fish tacos: Heat oil in a deep-fryer to 375 degrees F (190 degrees C).\n4.Dust fish pieces lightly with flour. Set aside.\n5.Dip floured fish pieces into beer batter. Set aside.\n6.Fry in hot oil until crisp and golden brown. Drain on paper towels. Lightly fry tortillas in hot oil until just crisped, but not too crisp. Drain on paper towels.\n7.Place fried fish in tortillas; top with shredded cabbage and white sauce."
   },
   {
     "_id": "4",
@@ -189,7 +242,6 @@
     "directions": "1.Make beer batter: Combine flour, cornstarch, baking powder, and salt in a large bowl. Blend beer and egg in a separate bowl, then quickly stir into flour mixture until combined with a few lumps remaining.\n2.Make white sauce: Mix together yogurt and mayonnaise in a medium bowl. Gradually stir in fresh lime juice until consistency is slightly runny. Season with jalapeño, capers, cayenne, oregano, cumin, and dill.\n3.Start fish tacos: Heat oil in a deep-fryer to 375 degrees F (190 degrees C).\n4.Dust fish pieces lightly with flour. Set aside.\n5.Dip floured fish pieces into beer batter. Set aside.\n6.Fry in hot oil until crisp and golden brown. Drain on paper towels. Lightly fry tortillas in hot oil until just crisped, but not too crisp. Drain on paper towels.\n7.Place fried fish in tortillas; top with shredded cabbage and white sauce."
   },
   {
-    "_id": "5",
     "owner": "1",
     "name": "Easy Roasted Broccoli",
     "description": "Roasted broccoli is easy to make and so much more flavorsome than boiled. My favorite part is the roasted sliced stem pieces.",
@@ -224,7 +276,6 @@
     "directions": "1.Preheat the oven to 400 degrees F (200 degrees C).\n2.Cut broccoli florets from the stalk. Peel the stalk and slice into 1/4-inch slices. Mix florets and stem pieces with olive oil in a bowl and transfer to a baking sheet; season with salt and pepper.\n3.Roast in the preheated oven until broccoli is tender and lightly browned, about 18 to 20 minutes."
   },
   {
-    "_id": "6",
     "owner": "1",
     "name": "Banana Banana Bread",
     "description": "This banana bread recipe creates the most delicious, moist loaf with loads of banana flavor. Why compromise the banana flavor? Friends and family love my recipe and say it's by far the best! It tastes wonderful toasted. Enjoy!",
@@ -264,7 +315,6 @@
     "directions": "1.Combine the dry ingredients in one bowl.\n2.Beat the butter and sugar in another bowl. Add the eggs and mashed bananas.\n3.Add the wet mixture to the dry mixture.\n4.Pour the batter into a 9x5 loaf pan and bake in a preheated oven (350 deg) for 1 hour.\n5.You'll know it's done when a toothpick inserted into the center of the loaf comes out clean.\n6.Make sure to let the bread sit in the pan for about 10 minutes before turning it out."
   },
   {
-    "_id": "7",
     "owner": "1",
     "name": "Slow Cooker Chipotle Chili",
     "description": "Smoky chipotle peppers inspired this chili recipe. It comes together easily in the slow cooker and is a unique chili that always stands out. It is a spicy yet mellow chili that gives a kick without the lingering burn, like many chilis do.",

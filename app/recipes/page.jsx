@@ -1,9 +1,18 @@
 import React from 'react';
 import Link from 'next/link';
-import recipes from '@/recipes.json';
+// import recipes from '@/recipes.json';
 import RecipeCard from '@/components/RecipeCard';
+import { fetchRecipes } from '@/utils/requests';
 
-const RecipesPage = () => {
+const RecipesPage = async () => {
+  const recipes = await fetchRecipes();
+
+  // sort recipes by category
+  // objs.sort(function(a,b) {return (a.last_nom > b.last_nom) ? 1 : ((b.last_nom > a.last_nom) ? -1 : 0)
+  recipes.sort((a, b) => {
+    return a.name > b.name ? 1 : b.name > a.name ? -1 : 0;
+  });
+
   return (
     <section className='px-4 py-6'>
       <div className='container-xl lg:container m-auto px-4 py-6'>

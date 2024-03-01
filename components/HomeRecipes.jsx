@@ -1,9 +1,12 @@
 import React from 'react';
-import recipes from '@/recipes.json';
+// import recipes from '@/recipes.json';
 import RecipeCard from './RecipeCard';
 import Link from 'next/link';
+import { fetchRecipes } from '@/utils/requests';
 
-const HomeRecipes = () => {
+const HomeRecipes = async () => {
+  const recipes = await fetchRecipes();
+
   const recentRecipes = recipes
     .sort(() => Math.random() - Math.random())
     .slice(0, 3);
