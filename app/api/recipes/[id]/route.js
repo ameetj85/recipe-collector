@@ -8,8 +8,6 @@ export const GET = async (req, { params }) => {
 
     const recipe = await Recipe.findById(params.id);
 
-    console.log('Recipe ID:', params.id);
-
     if (!recipe) {
       return new Response('Recipe Not Found.', { status: 404 });
     }

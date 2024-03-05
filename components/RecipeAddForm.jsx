@@ -90,7 +90,6 @@ const RecipeAddForm = () => {
         [name]: value,
       }));
     }
-    console.log(name, value);
   };
 
   const handleImageChange = (e) => {
@@ -129,8 +128,6 @@ const RecipeAddForm = () => {
   };
 
   const handleIngredientsChange = (e) => {
-    console.log(e.target.value);
-
     setFields((prevFields) => ({
       ...prevFields,
       ingredients: e.target.value,

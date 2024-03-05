@@ -12,33 +12,31 @@ const RecipeImages = ({ images }) => {
             className='object-cover h-[400px] mx-auto rounded-xl'
             width={1800}
             height={400}
-            priority={true}
+            priority
           />
         ) : (
           <div className='grid grid-cols-2 gap-4'>
             {images.map((img, index) => (
-              <>
-                <div
-                  key={index}
-                  className={`
+              <div
+                key={index}
+                className={`
                   ${
                     images.length === 3 && index == 2
                       ? 'col-span-2'
                       : 'col-span-1'
                   }
                 `}
-                >
-                  <Image
-                    src={img.includes('http') ? img : `/images/recipes/${img}`}
-                    alt=''
-                    className='object-cover h-[400px] w-full rounded-xl'
-                    sizes='100vw'
-                    width={0}
-                    height={0}
-                    priority={true}
-                  />
-                </div>
-              </>
+              >
+                <Image
+                  src={img.includes('http') ? img : `/images/recipes/${img}`}
+                  alt=''
+                  className='object-cover h-[400px] w-full rounded-xl'
+                  sizes='100vw'
+                  width={0}
+                  height={0}
+                  priority
+                />
+              </div>
             ))}
           </div>
         )}

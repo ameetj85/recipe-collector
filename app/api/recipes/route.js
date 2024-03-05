@@ -62,7 +62,7 @@ export const POST = async (req) => {
         protein: formData.get('nutritionInfo.protein'),
         sugars: formData.get('nutritionInfo.sugars'),
       },
-      ingredients: formData.get('ingredients'),
+      ingredients: formData.get('ingredients').split('\r\n'),
       // upload images logic is below
     };
 
@@ -95,11 +95,15 @@ export const POST = async (req) => {
     const newRecipe = new Recipe(recipeData);
     await newRecipe.save();
 
-    // console.log(recipeData);
-
     return Response.redirect(
       `${process.env.NEXTAUTH_URL}/recipes/${newRecipe._id}`
     );
+
+    /*
+    return new Response(JSON.stringify({ message: 'Success' }), {
+      status: 200,
+    });
+    */
   } catch (error) {
     console.error(error);
     return new Response('Failed to add recipe.', { status: 500 });

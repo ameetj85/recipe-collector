@@ -2,8 +2,6 @@ import React from 'react';
 import { div, FaBreadSlice, FaCorn } from 'react-icons/fa';
 
 const RecipeDetails = ({ recipe }) => {
-  console.log(recipe.cookTime);
-  console.log(recipe.directions.split('\n'));
   let directions = recipe.directions.split('\n');
 
   return (
@@ -92,13 +90,11 @@ const RecipeDetails = ({ recipe }) => {
         Ingredients
       </h3>
       <div className='ml-5 '>
-        <div>
-          <ul>
-            {recipe.ingredients.map((i, index) => (
-              <li key={index}>&#x2022; {i}</li>
-            ))}
-          </ul>
-        </div>
+        <ul>
+          {recipe.ingredients.map((i, index) => (
+            <li key={index}>&#x2022; {i}</li>
+          ))}
+        </ul>
       </div>
       <h3 className='text-lg font-bold my-6 bg-gray-800 text-white p-2'>
         Directions

@@ -21,10 +21,8 @@ const RecipePage = () => {
       if (!id) return;
 
       try {
-        // console.log('Recipe ID:', id);
         const recipe = await fetchRecipe(id);
         setRecipe(recipe);
-        // console.log(recipe);
       } catch (error) {
         console.error('Error fetching property: ', error);
         return null;

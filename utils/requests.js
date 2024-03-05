@@ -29,7 +29,6 @@ async function fetchRecipe(id) {
       return null;
     }
 
-    console.log('ID: ', id);
     const res = await fetch(`${apiDomain}/recipes/${id}`);
 
     if (!res.ok) {
