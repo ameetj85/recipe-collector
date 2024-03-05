@@ -1,7 +1,7 @@
 import connectDB from '@/config/database';
 import Recipe from '@/models/Recipe';
 
-// GET /api/properties/:id
+// GET /api/recipes/:id
 export const GET = async (req, { params }) => {
   try {
     await connectDB();

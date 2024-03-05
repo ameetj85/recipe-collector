@@ -9,6 +9,7 @@ import Spinner from '@/components/Spinner';
 import { fetchRecipe } from '@/utils/requests';
 import RecipeHeaderImage from '@/components/RecipeHeaderImage';
 import RecipeDetails from '@/components/RecipeDetails';
+import RecipeImages from '@/components/RecipeImages';
 
 const RecipePage = () => {
   const { id } = useParams();
@@ -156,6 +157,7 @@ const RecipePage = () => {
               </div>
             </div>
           </section>
+          <RecipeImages images={recipe.images} />
         </>
       )}
     </>
