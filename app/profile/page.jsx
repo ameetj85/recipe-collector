@@ -6,6 +6,7 @@ import Image from 'next/image';
 import { UseSessionOptions, useSession } from 'next-auth/react';
 import profileDefault from '@/assets/images/profile.png';
 import Spinner from '@/components/Spinner';
+import { toast } from 'react-toastify';
 
 const ProfilePage = () => {
   const { data: session } = useSession();
@@ -122,21 +123,20 @@ const ProfilePage = () => {
                       />
                     </Link>
                     <div className='mt-2'>
-                      <p className='text-lg font-semibold'>{recipeId.name}</p>
+                      <p className='text-lg font-semibold'>{recipe.name}</p>
                       <p className='text-gray-600'>
-                        Address: {recipe.location.street} {recipe.location.city}{' '}
-                        {recipe.location.state}
+                        Description: {recipe.description}
                       </p>
                     </div>
                     <div className='mt-2'>
                       <Link
-                        href={`/recipes/${recipeId._id}/edit`}
+                        href={`/recipes/${recipe._id}/edit`}
                         className='bg-blue-500 text-white px-3 py-3 rounded-md mr-2 hover:bg-blue-600'
                       >
                         Edit
                       </Link>
                       <button
-                        onClick={() => handleDeleteRecipe(recipeId._id)}
+                        onClick={() => handleDeleteRecipe(recipe._id)}
                         className='bg-red-500 text-white px-3 py-2 rounded-md hover:bg-red-600'
                         type='button'
                       >

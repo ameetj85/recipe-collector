@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect } from 'react';
 import { useParams, useRouter } from 'next/navigation';
-import { ToastClassName } from 'react-toastify';
+import { toast } from 'react-toastify';
 import { fetchRecipe, fetchRecipes } from '@/utils/requests';
 
 const RecipeEditForm = () => {
@@ -36,6 +36,35 @@ const RecipeEditForm = () => {
   });
 
   const [loading, setLoading] = useState(true);
+
+  const handleIngredientsChange = (e) => {
+    setFields((prevFields) => ({
+      ...prevFields,
+      ingredients: e.target.value,
+    }));
+  };
+
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+
+    // check if this is a nested recipe, eg. nutritionInfo.protein, etc
+    if (name.includes('.')) {
+      const [outerKey, innerKey] = name.split('.');
+      setFields((prevFields) => ({
+        ...prevFields,
+        [outerKey]: {
+          ...prevFields[outerKey],
+          [innerKey]: value,
+        },
+      }));
+    } else {
+      // not nested recipe
+      setFields((prevFields) => ({
+        ...prevFields,
+        [name]: value,
+      }));
+    }
+  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -82,7 +111,7 @@ const RecipeEditForm = () => {
 
   return (
     mounted && (
-      <form action='/api/recipes' method='POST' encType='multipart/form-data'>
+      <form onSubmit={handleSubmit}>
         <h2 className='text-3xl text-center font-semibold mb-6'>Add Recipe</h2>
 
         <div className='mb-4'>

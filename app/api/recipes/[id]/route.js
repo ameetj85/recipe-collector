@@ -59,6 +59,8 @@ export const DELETE = async (request, { params }) => {
 // PUT /api/recipes/:id
 export const PUT = async (req, { params }) => {
   try {
+    console.log('Inside PUT');
+
     await connectDB();
 
     const sessionUser = await getSessionUser();
@@ -111,13 +113,18 @@ export const PUT = async (req, { params }) => {
     };
 
     // update recipe in db
-    const updatedRecipe = await Recipe.findByIdAndUpdate(id, recipeData);
+    const filter = { _id: existingRecipe._id.toString() };
+    const options = { upsert: true };
+
+    const updatedRecipe = await Recipe.updateOne(filter, recipeData, options);
+
+    // const updatedRecipe = await Recipe.findByIdAndUpdate(id, recipeData);
 
     return new Response(JSON.stringify(updatedRecipe), {
       status: 200,
     });
   } catch (error) {
     console.error(error);
-    return new Response('Failed to add recipe.', { status: 500 });
+    return new Response('Failed to update recipe.', { status: 500 });
   }
 };

@@ -1,4 +1,5 @@
 import React from 'react';
+import RecipeEditForm from '@/components/RecipeEditForm';
 
 const RecipeEditPage = () => {
   return (

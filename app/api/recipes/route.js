@@ -22,6 +22,8 @@ export const GET = async (req) => {
 // POST /api/recipes
 export const POST = async (req) => {
   try {
+    console.log('Inside POST');
+
     await connectDB();
 
     const sessionUser = await getSessionUser();

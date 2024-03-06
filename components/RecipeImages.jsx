@@ -7,7 +7,11 @@ const RecipeImages = ({ images }) => {
       <div className='container mx-auto'>
         {images.length === 1 ? (
           <Image
-            src={images[0]}
+            src={
+              images[0].includes('http')
+                ? images[0]
+                : `/images/recipes/${images[0]}`
+            }
             alt=''
             className='object-cover h-[400px] mx-auto rounded-xl'
             width={1800}
