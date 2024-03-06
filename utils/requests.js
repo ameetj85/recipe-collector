@@ -21,7 +21,7 @@ async function fetchRecipes() {
   }
 }
 
-// GET: fetch a single property
+// GET: fetch a single recipe
 async function fetchRecipe(id) {
   try {
     // handle the case where the domain is not available yet

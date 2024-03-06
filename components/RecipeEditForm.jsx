@@ -1,44 +1,15 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
+import { useParams, useRouter } from 'next/navigation';
+import { ToastClassName } from 'react-toastify';
+import { fetchRecipe, fetchRecipes } from '@/utils/requests';
 
-const RecipeAddForm = () => {
+const RecipeEditForm = () => {
+  const { id } = useParams();
+  const router = useRouter();
+
   const [mounted, setMounted] = useState(false);
-  const [invalidImageCount, setInvalidImageCount] = useState(false);
-
-  /*
-  const [fields, setFields] = useState({
-    owner: '',
-    name: 'Test Recipe',
-    description: 'This is a description for a test recipe',
-    url: 'https://www.google.com',
-    starRating: '5',
-    category: 'American',
-    type: 'Chicken',
-    isFeatured: false,
-    prepTime: 20,
-    cookTime: 40,
-    totalTime: 60,
-    servings: 4,
-    directions:
-      'Heat oil in a nonstick pan over high heat. Add onion and salt; cook and stir until onion has softened, about 5 minutes.\nReduce heat to low; stir in garlic and ginger until fragrant. Add hot water; cover, and cook, stirring occasionally, until water has evaporated, about 5 minutes.\nAdd chili powder, ground coriander, cumin, and turmeric; cook and stir over high heat until spices are toasted, about 5 minutes. Stir in tomatoes and green chiles; cover and cook over low heat for 5 minutes.\nAdd chicken; cook and stir over high heat until browned, 5 to 7 minutes. Stir in curry paste; reduce heat to low, cover and cook until chicken is cooked through, adding a little water if necessary, about 5 minutes. Check seasoning and sprinkle with freshly chopped cilantro.',
-    nutritionInfo: {
-      calories: 182,
-      fat: 9,
-      carbs: 16,
-      protein: 12,
-      sugars: 0,
-    },
-    ingredients: [
-      '2 tablespoons vegetable oil\n',
-      '3 medium onions, finely chopped\n',
-      '1 teaspoon salt\n',
-      '4 cloves garlic, crushed\n',
-      '1 tablespoon minced fresh ginger\n',
-    ],
-    images: [],
-  });
-  */
   const [fields, setFields] = useState({
     owner: '',
     name: '',
@@ -64,75 +35,50 @@ const RecipeAddForm = () => {
     images: [],
   });
 
+  const [loading, setLoading] = useState(true);
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+
+    try {
+      const formData = new FormData(e.target);
+
+      const res = await fetch(`/api/recipes/${id}`, {
+        method: 'PUT',
+        body: formData,
+      });
+
+      if (res.status === 200) {
+        router.push(`/recipes/${id}`);
+      } else if (res.status === 401 || res.status === 403) {
+        toast.error('Permission denied.');
+      } else {
+        toast.error('Something went wrong.');
+      }
+    } catch (error) {
+      toast.error('Something went wrong.');
+      console.log(error);
+    }
+  };
+
   // this prevents console warnings to show up at runtime complaining about html and server.
   useEffect(() => {
     setMounted(true);
-    setInvalidImageCount(false);
-  }, []);
 
-  const handleChange = (e) => {
-    const { name, value } = e.target;
-
-    // check if this is a nested recipe, eg. nutritionInfo.protein, etc
-    if (name.includes('.')) {
-      const [outerKey, innerKey] = name.split('.');
-      setFields((prevFields) => ({
-        ...prevFields,
-        [outerKey]: {
-          ...prevFields[outerKey],
-          [innerKey]: value,
-        },
-      }));
-    } else {
-      // not nested recipe
-      setFields((prevFields) => ({
-        ...prevFields,
-        [name]: value,
-      }));
-    }
-  };
-
-  const handleImageChange = (e) => {
-    const { files } = e.target;
-
-    if (files.length > 2) {
-      setInvalidImageCount(true);
-    } else {
-      setInvalidImageCount(false);
-    }
-
-    if (files.length > 2) {
-      setInvalidImageCount(true);
-    } else {
-      setInvalidImageCount(false);
-    }
-
-    // we are going to overwrite prev selections
-    const updatedImages = [];
-
-    let count = 0;
-    // add new files to array - limit to 2 image files only.
-    for (const file of files) {
-      count++;
-      updatedImages.push(file);
-      if (count === 2) {
-        break;
+    // fetch recipe data for form
+    const fetchRecipeData = async () => {
+      try {
+        const recipeData = await fetchRecipe(id);
+        setFields(recipeData);
+      } catch (error) {
+        console.error(error);
+      } finally {
+        setLoading(false);
       }
-    }
+    };
 
-    // update state with array of images
-    setFields((prevFields) => ({
-      ...prevFields,
-      images: updatedImages,
-    }));
-  };
-
-  const handleIngredientsChange = (e) => {
-    setFields((prevFields) => ({
-      ...prevFields,
-      ingredients: e.target.value,
-    }));
-  };
+    fetchRecipeData();
+  }, []);
 
   return (
     mounted && (
@@ -412,38 +358,12 @@ const RecipeAddForm = () => {
           </div>
         </div>
 
-        <div className='mb-4'>
-          <label
-            htmlFor='images'
-            className='block text-gray-700 font-bold mb-2'
-          >
-            Images (Select up to 2 images)
-          </label>
-          <input
-            type='file'
-            id='images'
-            name='images'
-            className='border rounded w-full py-2 px-3'
-            accept='image/*'
-            multiple
-            onChange={handleImageChange}
-            required
-          />
-          <div>
-            {invalidImageCount && (
-              <p className='text-red-500'>
-                Please do not select more than 2 files.
-              </p>
-            )}
-          </div>
-        </div>
-
         <div>
           <button
             className='bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded-full w-full focus:outline-none focus:shadow-outline'
             type='submit'
           >
-            Add Recipe
+            Update Recipe
           </button>
         </div>
       </form>
@@ -451,4 +371,4 @@ const RecipeAddForm = () => {
   );
 };
 
-export default RecipeAddForm;
+export default RecipeEditForm;

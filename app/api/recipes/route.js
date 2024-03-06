@@ -39,7 +39,7 @@ export const POST = async (req) => {
       .getAll('images')
       .filter((image) => image.name != '');
 
-    // create property data object for db
+    // create recipe data object for db
     const recipeData = {
       owner: userId,
       name: formData.get('name'),
@@ -88,7 +88,7 @@ export const POST = async (req) => {
 
       // Wait for all images to upload
       const uploadedImages = await Promise.all(imageUploadPromises);
-      // add uploaded images to the propertyData object
+      // add uploaded images to the recipeData object
       recipeData.images = uploadedImages;
     }
 

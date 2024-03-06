@@ -17,14 +17,14 @@ const RecipePage = () => {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const fetchPropertyData = async () => {
+    const fetchRecipeData = async () => {
       if (!id) return;
 
       try {
         const recipe = await fetchRecipe(id);
         setRecipe(recipe);
       } catch (error) {
-        console.error('Error fetching property: ', error);
+        console.error('Error fetching recipe: ', error);
         return null;
       } finally {
         setLoading(false);
@@ -32,7 +32,7 @@ const RecipePage = () => {
     };
 
     if (recipe === null) {
-      fetchPropertyData();
+      fetchRecipeData();
     }
   }, [id, recipe]);
 
