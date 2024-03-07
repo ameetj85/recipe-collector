@@ -71,7 +71,7 @@ const ProfilePage = () => {
 
         setRecipes(updatedRecipes);
 
-        toast.success('Recipe Deleted');
+        toast.success('Recipe Deleted', { position: 'bottom-right' });
       } else {
         toast.error('Failed to delete recipe', toastOptions);
       }
