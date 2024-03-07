@@ -4,6 +4,9 @@ import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
 import AuthProvider from '@/components/AuthProvider';
 
+import '@/assets/styles/globals.css';
+import 'react-toastify/dist/ReactToastify.css';
+
 export const metadata = {
   title: 'Recepi App | Find the perfect recipe',
   description: 'Find the inspiration for ypur next meal.',

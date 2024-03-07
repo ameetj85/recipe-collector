@@ -8,6 +8,12 @@ import profileDefault from '@/assets/images/profile.png';
 import Spinner from '@/components/Spinner';
 import { toast } from 'react-toastify';
 
+const toastOptions = {
+  autoClose: false,
+  position: 'bottom-right',
+  closeOnClick: true,
+};
+
 const ProfilePage = () => {
   const { data: session } = useSession();
   const profileImage = session?.user?.image;
@@ -55,6 +61,8 @@ const ProfilePage = () => {
         method: 'DELETE',
       });
 
+      console.log('Delete status:', res.status);
+
       if (res.status === 200) {
         // Remove the recipeId from state
         const updatedRecipes = recipes.filter(
@@ -63,7 +71,7 @@ const ProfilePage = () => {
 
         setRecipes(updatedRecipes);
 
-        toast.success('Recipe Deleted', toastOptions);
+        toast.success('Recipe Deleted');
       } else {
         toast.error('Failed to delete recipe', toastOptions);
       }
