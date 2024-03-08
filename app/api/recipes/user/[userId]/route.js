@@ -2,7 +2,7 @@ import connectDB from '@/config/database';
 import Recipe from '@/models/Recipe';
 
 // GET all recipes for a specific user
-// /api/recipe/user/:userId
+// /api/recipes/user/:userId
 export const GET = async (req, { params }) => {
   try {
     await connectDB();

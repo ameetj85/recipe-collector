@@ -4,7 +4,7 @@ import Link from 'next/link';
 import { FaBreadSlice, FaCorn } from 'react-icons/fa';
 
 const RecipeCard = ({ recipe }) => {
-  // We want to retain our test properties, whose images are stored on disc.
+  // We want to retain our test recipe, whose images are stored on disc.
   // We also want to show our images that stared in Cloudinary.
   let imagePath = `/images/recipes/${recipe.images[0]}`;
   if (recipe.images[0].includes('https')) {

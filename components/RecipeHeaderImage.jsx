@@ -2,7 +2,7 @@ import React from 'react';
 import Image from 'next/image';
 
 const RecipeHeaderImage = ({ image }) => {
-  // We want to retain our test properties, whose images are stored on disc.
+  // We want to retain our test recipes, whose images are stored on disc.
   // We also want to show our images that stared in Cloudinary.
   let imagePath = `/images/recipes/${image}`;
   if (image.includes('http')) {
