@@ -21,11 +21,11 @@ const RecipeDetails = ({ recipe }) => {
         <div className='text-gray-500 mb-4'>{recipe.category}</div>
       </div>
 
-      <h3 className='text-lg font-bold my-4 bg-gray-800 text-white p-2'>
+      <h3 className='mt-6 text-lg font-bold mb-2  bg-gray-800 text-white p-2'>
         Description
       </h3>
-      <div className='flex flex-col md:flex-row justify-around'>
-        <div className='flex items-center justify-center mb-4 border-b border-gray-200 md:border-b-0 pb-4 md:pb-0'>
+      <div className='bg-white p-6 rounded-lg shadow-md text-center md:text-left'>
+        <div className='flex  gap-4 text-gray-500 mb-2'>
           {recipe.description}
         </div>
       </div>
@@ -86,21 +86,21 @@ const RecipeDetails = ({ recipe }) => {
         </div>
       </div>
 
-      <h3 className='text-lg font-bold my-6 bg-gray-800 text-white p-2'>
+      <h3 className='mt-6 text-lg font-bold mb-2  bg-gray-800 text-white p-2'>
         Ingredients
       </h3>
-      <div className='ml-5 '>
+      <div className='bg-white  text-gray-500 rounded-lg shadow-md mb-2 pl-2'>
         <ul>
           {recipe.ingredients.map((i, index) => (
             <li key={index}>&#x2022; {i}</li>
           ))}
         </ul>
       </div>
-      <h3 className='text-lg font-bold my-6 bg-gray-800 text-white p-2'>
+      <h3 className='mt-6 text-lg font-bold mb-2  bg-gray-800 text-white p-2'>
         Directions
       </h3>
       <div className=''>
-        <div className='ml-4'>
+        <div className='bg-white  text-gray-500 rounded-lg shadow-md mb-2 p-2 '>
           <ul>
             {directions.map((i, index) => (
               <li key={index}>&#x2022; {i}</li>
