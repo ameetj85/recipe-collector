@@ -1,12 +1,21 @@
 import React from 'react';
 import { div, FaBreadSlice, FaCorn } from 'react-icons/fa';
-import { FaCopy } from 'react-icons/fa';
+import { FaCopy, FaPrint } from 'react-icons/fa';
 // import Tooltip from '@/components/Tooltip';
 import { Tooltip } from 'react-tooltip';
 import '@/components/RecipeDetails.css';
 
 const RecipeDetails = ({ recipe }) => {
   let directions = recipe.directions.split('\n');
+
+  const handleCopyIngredients = () => {
+    let ingredients = '';
+
+    recipe.ingredients.map((i) => (ingredients = ingredients + i + '\r\n'));
+
+    navigator.clipboard.writeText(`${ingredients}`);
+    window.confirm('Ingredients list copied to Clipboard.);');
+  };
 
   return (
     <main>
@@ -16,6 +25,13 @@ const RecipeDetails = ({ recipe }) => {
           <span className='ml-6  bg-white px-4 py-2 rounded-lg text-blue-500 font-bold'>
             {recipe.starRating} stars
           </span>
+          <button
+            title='Print this Recipe'
+            className='float-right  bg-blue-500 text-white px-2 py-1 mt-1 rounded-md'
+            onClick={() => window.print()}
+          >
+            <FaPrint />
+          </button>
         </div>
         <h1 className='text-3xl font-bold mb-4 text-blue-800'>
           <a target='_blank' href={recipe.url} rel='noopener noreferrer'>
@@ -90,14 +106,18 @@ const RecipeDetails = ({ recipe }) => {
         </div>
       </div>
 
-      <div className='position:absolute mt-6 text-lg font-bold mb-2  bg-gray-800 text-white p-2'>
-        <div className='tooltip'>
-          <span className='tooltiptext'>Copy Ingredients to Clipboard</span>
-          <h3>Ingredients</h3>
-        </div>
-      </div>
+      <h3 className='text-lg font-bold my-6 bg-gray-800 text-white p-2'>
+        Ingredients
+      </h3>
 
       <div className='bg-white  text-gray-500 rounded-lg shadow-md mb-2 pl-2'>
+        <button
+          title='Copy Ingredients to Clipboard'
+          className='float-right  bg-blue-500 text-white px-2 py-1 mt-1 mr-2 rounded-md'
+          onClick={() => handleCopyIngredients()}
+        >
+          <FaCopy />
+        </button>
         <ul>
           {recipe.ingredients.map((i, index) => (
             <li key={index}>&#x2022; {i}</li>
