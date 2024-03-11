@@ -36,7 +36,7 @@ export const GET = async (req) => {
       ],
     };
 
-    // only check for property type if it is not All
+    // only check for recipe type if it is not All
     if (recipeType && recipeType !== 'All') {
       const typePattern = new RegExp(recipeType.toLowerCase(), 'i');
       console.log('type pattern:', typePattern);

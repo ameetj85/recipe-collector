@@ -1,5 +1,9 @@
 import React from 'react';
 import { div, FaBreadSlice, FaCorn } from 'react-icons/fa';
+import { FaCopy } from 'react-icons/fa';
+// import Tooltip from '@/components/Tooltip';
+import { Tooltip } from 'react-tooltip';
+import '@/components/RecipeDetails.css';
 
 const RecipeDetails = ({ recipe }) => {
   let directions = recipe.directions.split('\n');
@@ -86,9 +90,13 @@ const RecipeDetails = ({ recipe }) => {
         </div>
       </div>
 
-      <h3 className='mt-6 text-lg font-bold mb-2  bg-gray-800 text-white p-2'>
-        Ingredients
-      </h3>
+      <div className='position:absolute mt-6 text-lg font-bold mb-2  bg-gray-800 text-white p-2'>
+        <div className='tooltip'>
+          <span className='tooltiptext'>Copy Ingredients to Clipboard</span>
+          <h3>Ingredients</h3>
+        </div>
+      </div>
+
       <div className='bg-white  text-gray-500 rounded-lg shadow-md mb-2 pl-2'>
         <ul>
           {recipe.ingredients.map((i, index) => (

@@ -22,7 +22,7 @@ export const POST = async (req) => {
     // find user in db
     const user = await User.findOne({ _id: userId });
 
-    // check if property is bookmarked
+    // check if recipe is bookmarked
     let isBookmarked = user.bookmarks.includes(recipeId);
 
     return new Response(JSON.stringify({ isBookmarked }), {
