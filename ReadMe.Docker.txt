@@ -70,3 +70,5 @@ Create DNS records using your own domain in Hivelocity -
     https://www.hivelocity.net/kb/how-to-create-dns-records-in-myvelocity/
 
 Vercel url: recipe-collector-tau.vercel.app
+
+Git repo
