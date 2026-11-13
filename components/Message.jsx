@@ -1,60 +1,56 @@
 'use client';
-import { useState, useEffect } from 'react';
+import { useState, useTransition } from 'react';
 import { toast } from 'react-toastify';
 import { useGlobalContext } from '@/context/GlobalContext';
+import { toggleMessageRead, deleteMessage } from '@/app/actions/messages';
 
 const Message = ({ message }) => {
   const [isRead, setIsRead] = useState(message.read);
   const [isDeleted, setIsDeleted] = useState(false);
+  const [isPending, startTransition] = useTransition();
 
   const { setUnreadCount } = useGlobalContext();
 
-  const handleReadClick = async () => {
-    try {
-      const res = await fetch(`/api/messages/${message._id}`, {
-        method: 'PUT',
-      });
+  const handleReadClick = () => {
+    startTransition(async () => {
+      const result = await toggleMessageRead(message._id);
 
-      if (res.status === 200) {
-        const { read } = await res.json();
-        setIsRead(read);
-        setUnreadCount((prevCount) => (read ? prevCount - 1 : prevCount + 1));
-        if (read) {
-          toast.success('Marked as read');
-        } else {
-          toast.success('Marked as new');
-        }
+      if (result.error) {
+        toast.error(result.error);
+        return;
       }
-    } catch (error) {
-      console.log(error);
-      toast.error('Something went wrong');
-    }
+
+      const { read } = result;
+      setIsRead(read);
+      setUnreadCount((prevCount) =>
+        read ? Math.max(prevCount - 1, 0) : prevCount + 1
+      );
+      toast.success(read ? 'Marked as read' : 'Marked as new');
+    });
   };
 
-  const handleDeleteClick = async () => {
+  const handleDeleteClick = () => {
     const confirmed = window.confirm(
       'Are you sure that you want to delete this message?'
     );
 
     if (!confirmed) return;
 
-    try {
-      const res = await fetch(`/api/messages/${message._id}`, {
-        method: 'DELETE',
-      });
+    startTransition(async () => {
+      const result = await deleteMessage(message._id);
 
-      if (res.status === 201) {
-        setIsDeleted(true);
-        // only an unread message contributes to the unread count
-        if (!isRead) {
-          setUnreadCount((prevCount) => Math.max(prevCount - 1, 0));
-        }
-        toast.success('Message Deleted');
+      if (result.error) {
+        toast.error(result.error);
+        return;
       }
-    } catch (error) {
-      console.log(error);
-      toast.error('Message was not deleted');
-    }
+
+      setIsDeleted(true);
+      // only an unread message contributes to the unread count
+      if (!isRead) {
+        setUnreadCount((prevCount) => Math.max(prevCount - 1, 0));
+      }
+      toast.success('Message Deleted');
+    });
   };
 
   if (isDeleted) {
@@ -112,13 +108,17 @@ const Message = ({ message }) => {
       </ul>
       <button
         onClick={handleReadClick}
+        disabled={isPending}
         className={`mt-5 mr-3 text-sm ${
           isRead ? 'btn-secondary' : 'btn-primary'
         }`}
       >
         {isRead ? 'Mark As New' : 'Mark As Read'}
       </button>
-      <button onClick={handleDeleteClick} className='mt-5 btn-danger text-sm'>
+      <button
+        onClick={handleDeleteClick}
+        disabled={isPending}
+        className='mt-5 btn-danger text-sm'>
         Delete
       </button>
     </div>

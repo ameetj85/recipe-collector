@@ -1,85 +1,18 @@
-'use client';
-
-import React, { useState, useEffect } from 'react';
-import Link from 'next/link';
+import React from 'react';
 import Image from 'next/image';
-import { UseSessionOptions, useSession } from 'next-auth/react';
 import profileDefault from '@/assets/images/profile.png';
-import Spinner from '@/components/Spinner';
-import { toast } from 'react-toastify';
+import ProfileRecipes from '@/components/ProfileRecipes';
+import { getSessionUser } from '@/utils/getSessionUser';
+import { getRecipesByOwner } from '@/utils/queries';
 
-const toastOptions = {
-  autoClose: false,
-  position: 'bottom-right',
-  closeOnClick: true,
-};
+const ProfilePage = async () => {
+  // middleware.js guards this route, so a session is expected
+  const sessionUser = await getSessionUser();
+  const profileImage = sessionUser?.user?.image;
+  const profileName = sessionUser?.user?.name;
+  const profileEmail = sessionUser?.user?.email;
 
-const ProfilePage = () => {
-  const { data: session } = useSession();
-  const profileImage = session?.user?.image;
-  const profileName = session?.user?.name;
-  const profileEmail = session?.user?.email;
-
-  const [recipes, setRecipes] = useState([]);
-  const [loading, setLoading] = useState(true);
-
-  useEffect(() => {
-    const fetchUserRecipes = async (userId) => {
-      if (!userId) {
-        return;
-      }
-
-      try {
-        const res = await fetch(`/api/recipes/user/${userId}`);
-
-        if (res.status === 200) {
-          const data = await res.json();
-          setRecipes(data);
-        }
-      } catch (error) {
-        console.log(error);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    // Fetch user recipes when session is available
-    if (session?.user?.id) {
-      fetchUserRecipes(session.user.id);
-    }
-  }, [session]);
-
-  const handleDeleteRecipe = async (recipeId) => {
-    const confirmed = window.confirm(
-      'Are you sure you want to delete this recipe?'
-    );
-
-    if (!confirmed) return;
-
-    try {
-      const res = await fetch(`/api/recipes/${recipeId}`, {
-        method: 'DELETE',
-      });
-
-      console.log('Delete status:', res.status);
-
-      if (res.status === 200) {
-        // Remove the recipeId from state
-        const updatedRecipes = recipes.filter(
-          (recipe) => recipe._id !== recipeId
-        );
-
-        setRecipes(updatedRecipes);
-
-        toast.success('Recipe Deleted', { position: 'bottom-right' });
-      } else {
-        toast.error('Failed to delete recipe', toastOptions);
-      }
-    } catch (error) {
-      console.log(error);
-      toast.error('Failed to delete recipe'), toastOptions;
-    }
-  };
+  const recipes = await getRecipesByOwner(sessionUser?.userId);
 
   return (
     <section className='page-bg'>
@@ -117,62 +50,7 @@ const ProfilePage = () => {
 
             <div className='md:w-3/4 md:pt-6'>
               <h2 className='section-title !mt-0'>Your Listings</h2>
-              {!loading && recipes.length === 0 && (
-                <p className='rounded-xl bg-purple-50 p-6 text-purple-700'>
-                  You have no recipe listings
-                </p>
-              )}
-              <div className='grid grid-cols-1 lg:grid-cols-2 gap-6'>
-
-              {loading ? (
-                <Spinner loading={loading} />
-              ) : (
-                recipes.map((recipe) => (
-                  <div
-                    key={recipe._id}
-                    className='overflow-hidden rounded-2xl bg-white ring-1 ring-purple-100 shadow-md transition hover:shadow-xl hover:shadow-purple-700/10'
-                  >
-                    <Link href={`/recipes/${recipe._id}`}>
-                      <Image
-                        className='h-40 w-full object-cover'
-                        src={
-                          recipe.images[0].includes('http')
-                            ? recipe.images[0]
-                            : `/images/recipes/${recipe.images[0]}`
-                        }
-                        alt=''
-                        width={500}
-                        height={100}
-                        priority={true}
-                      />
-                    </Link>
-                    <div className='px-5 pt-4'>
-                      <p className='font-display text-lg font-bold text-purple-950'>
-                        {recipe.name}
-                      </p>
-                      <p className='mt-1 text-sm text-slate-500 line-clamp-2'>
-                        {recipe.description}
-                      </p>
-                    </div>
-                    <div className='flex gap-3 px-5 py-4'>
-                      <Link
-                        href={`/recipes/${recipe._id}/edit`}
-                        className='btn-primary text-sm px-6'
-                      >
-                        Edit
-                      </Link>
-                      <button
-                        onClick={() => handleDeleteRecipe(recipe._id)}
-                        className='btn-danger text-sm px-6'
-                        type='button'
-                      >
-                        Delete
-                      </button>
-                    </div>
-                  </div>
-                ))
-              )}
-              </div>
+              <ProfileRecipes recipes={recipes} />
             </div>
           </div>
         </div>

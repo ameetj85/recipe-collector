@@ -2,10 +2,10 @@ import React from 'react';
 import Link from 'next/link';
 import { FaArrowRight } from 'react-icons/fa';
 import RecipeCarousel from './RecipeCarousel';
-import { fetchRecipes } from '@/utils/requests';
+import { getRecipes } from '@/utils/queries';
 
 const HomeRecipes = async () => {
-  const recipes = await fetchRecipes();
+  const recipes = await getRecipes();
 
   // Shuffle so the carousel shows a different order on each visit.
   const featured = [...recipes]

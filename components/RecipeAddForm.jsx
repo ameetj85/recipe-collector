@@ -1,9 +1,19 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
+import { useFormState } from "react-dom";
+import { toast } from "react-toastify";
+import { addRecipe } from "@/app/actions/recipes";
+import SubmitButton from "@/components/SubmitButton";
 
 const RecipeAddForm = () => {
+  // addRecipe redirects to the new recipe on success, or returns { error }
+  const [formState, formAction] = useFormState(addRecipe, {});
   const [mounted, setMounted] = useState(false);
+
+  useEffect(() => {
+    if (formState?.error) toast.error(formState.error);
+  }, [formState]);
   const [invalidImageCount, setInvalidImageCount] = useState(false);
 
   /*
@@ -136,7 +146,7 @@ const RecipeAddForm = () => {
 
   return (
     mounted && (
-      <form action="/api/recipes" method="POST" encType="multipart/form-data">
+      <form action={formAction}>
         <h2 className="font-display text-4xl text-center font-bold gradient-text mb-10">Add Recipe</h2>
 
         <div className="form-group">
@@ -464,12 +474,12 @@ const RecipeAddForm = () => {
         </div>
 
         <div>
-          <button
+          <SubmitButton
             className="btn-primary w-full py-3.5 text-lg mt-4"
-            type="submit"
+            pendingText="Adding Recipe..."
           >
             Add Recipe
-          </button>
+          </SubmitButton>
         </div>
       </form>
     )
