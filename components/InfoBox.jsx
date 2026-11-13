@@ -11,7 +11,7 @@ const variants = {
     button: 'btn-dark',
   },
   dark: {
-    box: 'bg-gradient-to-br from-purple-700 via-purple-600 to-fuchsia-600 text-white',
+    box: 'bg-linear-to-br from-purple-700 via-purple-600 to-fuchsia-600 text-white',
     heading: 'text-white',
     text: 'text-purple-100',
     icon: 'bg-white/15 text-white',

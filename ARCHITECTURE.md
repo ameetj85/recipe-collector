@@ -11,13 +11,13 @@ Recipe Collector is a full-stack web app for collecting and sharing recipes. Sig
 - Share recipes on social media, print them, and copy their ingredient lists
 - Send messages to a recipe's owner and manage their own inbox
 
-The app is one **Next.js 14 (App Router)** project. Server Components read MongoDB directly and mutations run as **Server Actions**; there is no REST API apart from the NextAuth handler.
+The app is one **Next.js 16 (App Router)** project. Server Components read MongoDB directly and mutations run as **Server Actions**; there is no REST API apart from the NextAuth handler.
 
 | Concern | Technology |
 |---|---|
-| Framework | Next.js 14.1 (App Router), React 18 |
+| Framework | Next.js 16 (App Router, Turbopack), React 19 |
 | Language | JavaScript (JSX), no TypeScript |
-| Styling | Tailwind CSS 3 (Poppins font, custom `70/30` grid), plus one plain CSS file |
+| Styling | Tailwind CSS 4 (config in `globals.css` via `@theme`; Poppins font, custom `70/30` grid), plus one plain CSS file |
 | Database | MongoDB through Mongoose 8 |
 | Authentication | NextAuth v4 with the Google OAuth provider |
 | Image storage | Cloudinary (uploads); seed images in `public/images/recipes` |
@@ -37,7 +37,7 @@ The app is one **Next.js 14 (App Router)** project. Server Components read Mongo
   (useSession,      │   │                         (reads)        │   │
    Server Actions)  │   └─ Client Components ──► app/actions/* ──┤   │
                     │                            (mutations)     ▼   │
-                    │  middleware.js (NextAuth route guard)   Mongoose │
+                    │  proxy.js (NextAuth route guard)        Mongoose │
                     │  utils/authOptions ◄── getSessionUser ◄────┤   │
                     └──────────────┬──────────────┬──────────────┼───┘
                                    │              │              │
@@ -81,14 +81,14 @@ recipe-collector/
 ├── context/GlobalContext.js   # Client-side global state (unread message count)
 ├── models/                    # Mongoose models: User, Recipe, Message
 ├── utils/                     # authOptions, getSessionUser, queries (server reads), cloudinaryImages (upload/delete)
-├── middleware.js              # NextAuth middleware protecting private routes
+├── proxy.js                   # NextAuth route guard (Next 16 name for middleware)
 ├── assets/                    # Bundled images (logo, default profile) + globals.css
 ├── public/images/             # Static images, incl. seed recipe photos
 ├── recipes.json               # Sample/seed recipe data (with _id)
 ├── recipes-import.json        # Same data shaped for a MongoDB import (no _id)
 ├── next.config.mjs            # standalone output, remote image hosts, Server Action body limit
-├── tailwind.config.js / postcss.config.js
-├── Dockerfile                 # Multi-stage production image (Node 18, standalone)
+├── postcss.config.js / eslint.config.mjs
+├── Dockerfile                 # Multi-stage production image (Node 22, standalone)
 ├── Dockerfile.original        # Earlier single-stage Dockerfile (Node 22)
 ├── docker-compose.yml
 ├── ReadMe.Docker.txt          # Build/push/deploy notes
@@ -182,7 +182,7 @@ Query functions catch their own errors and return `[]`, `null`, `false` or `0`, 
 | `BookmarButton` | Starts from `initialIsBookmarked` (resolved by the page) and toggles with `toggleBookmark` |
 | `ShareButtons` | Facebook, Twitter/X, WhatsApp and Email share (react-share) |
 | `RecipeContactForm` | Sends a message to the recipe owner with `sendMessage` |
-| `RecipeAddForm` / `RecipeEditForm` | Controlled forms for every recipe field, submitted with `<form action>` + `useFormState` (`addRecipe` / `updateRecipe.bind(null, id)`); errors show as a toast. Nested fields use dotted names such as `nutritionInfo.calories`. At most 2 images |
+| `RecipeAddForm` / `RecipeEditForm` | Controlled forms for every recipe field, submitted with `<form action>` + `useActionState` (`addRecipe` / `updateRecipe.bind(null, id)`); errors show as a toast. Nested fields use dotted names such as `nutritionInfo.calories`. At most 2 images |
 | `SubmitButton` | `useFormStatus` submit button that disables itself while the action (e.g. image upload) runs |
 | `ProfileRecipes` | The profile page's recipe list with Edit links and `deleteRecipe` buttons |
 | `Messages` / `Message` | Inbox list; mark read/unread and delete, updating the unread count in context |
@@ -218,17 +218,17 @@ The only remaining route handler is `/api/auth/[...nextauth]` (NextAuth, Google 
 - **`signIn` callback:** on first sign-in, creates a `User` document from the Google profile (email, name cut to 20 characters, picture).
 - **`session` callback:** looks up the user by email and adds the Mongo `_id` to `session.user.id`. Both the client and the API rely on this field.
 - **Session strategy:** NextAuth default (JWT cookie). `NEXTAUTH_SECRET` signs it.
-- **Route protection:** `middleware.js` re-exports `next-auth/middleware` for `/recipes/add`, `/profile`, `/recipes/saved` and `/messages`. Anonymous users are sent to sign in.
+- **Route protection:** `proxy.js` exports `withAuth` from `next-auth/middleware` for `/recipes/add`, `/profile`, `/recipes/saved` and `/messages`. Anonymous users are sent to sign in.
 - **Action protection:** `utils/getSessionUser.js` wraps `getServerSession(authOptions)` and returns `{ user, userId }` or `null`. Server Actions check ownership: `recipe.owner === userId` for recipes and `message.recipient === userId` for messages.
 
-> `/recipes/[id]/edit` is **not** in the middleware matcher. The page itself redirects anyone who isn't the owner back to the recipe, and `updateRecipe` checks ownership again.
+> `/recipes/[id]/edit` is **not** in the proxy matcher. The page itself redirects anyone who isn't the owner back to the recipe, and `updateRecipe` checks ownership again.
 
 ---
 
 ## 8. Key flows
 
 ### Add a recipe
-1. A signed-in user opens `/recipes/add` (the middleware checks the session).
+1. A signed-in user opens `/recipes/add` (the proxy checks the session).
 2. `RecipeAddForm` submits to the `addRecipe` Server Action (`<form action>`); `SubmitButton` shows "Adding Recipe..." while it runs.
 3. The action reads `FormData` and turns the ingredients textarea into an array with `utils/parseIngredients.js`, one item per non-blank line. It uploads up to 2 images to Cloudinary in parallel through `utils/cloudinaryImages.js`, then saves the `Recipe` with the returned `secure_url`s.
 4. It calls `redirect('/recipes/:id')`, so the browser lands on the new recipe. On failure it returns `{ error }`, which the form shows as a toast.
@@ -280,7 +280,7 @@ npm run dev             # http://localhost:9000
 ```
 Other scripts: `npm run build`, `npm start`, `npm run lint`.
 
-**Docker** (`Dockerfile`, multi-stage on `node:18-alpine`)
+**Docker** (`Dockerfile`, multi-stage on `node:22-alpine`)
 1. `deps`: installs dependencies from whichever lockfile is present.
 2. `builder`: runs `next build`.
 3. `runner`: copies `.next/standalone`, `.next/static` and `public`, runs as the non-root `nextjs` user, and starts `node server.js` on port 9000.

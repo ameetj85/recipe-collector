@@ -62,7 +62,7 @@ const ProfileRecipes = ({ recipes }) => {
               alt=''
               width={500}
               height={100}
-              priority={true}
+              preload
             />
           </Link>
           <div className='px-5 pt-4'>

@@ -10,9 +10,10 @@ import BookmarkButton from '@/components/BookmarButton';
 import ShareButtons from '@/components/ShareButtons';
 import RecipeContactForm from '@/components/RecipeContactForm';
 
-const RecipePage = async ({ params }) => {
+const RecipePage = async (props) => {
+  const { id } = await props.params;
   const [recipe, sessionUser] = await Promise.all([
-    getRecipeById(params.id),
+    getRecipeById(id),
     getSessionUser(),
   ]);
 

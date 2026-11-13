@@ -64,7 +64,7 @@ const Message = ({ message }) => {
       }`}
     >
       {!isRead && (
-        <div className='absolute top-4 right-4 badge bg-gradient-to-r from-fuchsia-500 to-purple-600 text-white shadow'>
+        <div className='absolute top-4 right-4 badge bg-linear-to-r from-fuchsia-500 to-purple-600 text-white shadow-sm'>
           New
         </div>
       )}

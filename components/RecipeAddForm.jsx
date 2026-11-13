@@ -1,14 +1,13 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
-import { useFormState } from "react-dom";
+import React, { useState, useEffect, useActionState } from "react";
 import { toast } from "react-toastify";
 import { addRecipe } from "@/app/actions/recipes";
 import SubmitButton from "@/components/SubmitButton";
 
 const RecipeAddForm = () => {
   // addRecipe redirects to the new recipe on success, or returns { error }
-  const [formState, formAction] = useFormState(addRecipe, {});
+  const [formState, formAction] = useActionState(addRecipe, {});
   const [mounted, setMounted] = useState(false);
 
   useEffect(() => {

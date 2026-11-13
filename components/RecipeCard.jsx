@@ -31,7 +31,7 @@ const RecipeCard = ({ recipe }) => {
           sizes='(max-width: 768px) 100vw, 33vw'
           className='object-cover transition-transform duration-500 group-hover:scale-110'
         />
-        <div className='absolute inset-0 bg-gradient-to-t from-purple-950/70 via-purple-900/10 to-transparent' />
+        <div className='absolute inset-0 bg-linear-to-t from-purple-950/70 via-purple-900/10 to-transparent' />
 
         <div className='absolute top-3 right-3 flex items-center gap-0.5 rounded-full bg-white/95 px-3 py-1.5 shadow-md'>
           {[...Array(5)].map((_, i) => (
@@ -45,7 +45,7 @@ const RecipeCard = ({ recipe }) => {
           <span className='sr-only'>{recipe.starRating} stars</span>
         </div>
 
-        <span className='absolute bottom-3 left-3 rounded-full bg-purple-600/90 px-3 py-1 text-xs font-semibold text-white backdrop-blur'>
+        <span className='absolute bottom-3 left-3 rounded-full bg-purple-600/90 px-3 py-1 text-xs font-semibold text-white backdrop-blur-sm'>
           {recipe.category}
         </span>
       </Link>

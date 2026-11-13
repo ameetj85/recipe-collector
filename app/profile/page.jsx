@@ -34,13 +34,13 @@ const ProfilePage = async () => {
                   alt='User'
                 />
               </div>
-              <h2 className='text-xl mb-4 text-slate-700 break-words'>
+              <h2 className='text-xl mb-4 text-slate-700 wrap-break-word'>
                 <span className='block text-xs font-semibold uppercase tracking-wider text-purple-500'>
                   Name
                 </span>
                 {profileName}
               </h2>
-              <h2 className='text-xl text-slate-700 break-words'>
+              <h2 className='text-xl text-slate-700 wrap-break-word'>
                 <span className='block text-xs font-semibold uppercase tracking-wider text-purple-500'>
                   Email
                 </span>
@@ -49,7 +49,7 @@ const ProfilePage = async () => {
             </div>
 
             <div className='md:w-3/4 md:pt-6'>
-              <h2 className='section-title !mt-0'>Your Listings</h2>
+              <h2 className='section-title mt-0!'>Your Listings</h2>
               <ProfileRecipes recipes={recipes} />
             </div>
           </div>

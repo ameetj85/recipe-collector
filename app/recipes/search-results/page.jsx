@@ -5,7 +5,8 @@ import RecipeCard from '@/components/RecipeCard';
 import RecipeSearchForm from '@/components/RecipeSearchForm';
 import { searchRecipes } from '@/utils/queries';
 
-const SearchResultsPage = async ({ searchParams }) => {
+const SearchResultsPage = async (props) => {
+  const searchParams = await props.searchParams;
   const recipes = await searchRecipes({
     searchCriteria: searchParams.searchCriteria || '',
     recipeType: searchParams.recipeType,

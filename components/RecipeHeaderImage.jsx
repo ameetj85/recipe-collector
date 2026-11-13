@@ -15,11 +15,11 @@ const RecipeHeaderImage = ({ image, title, subtitle }) => {
         alt=''
         className='absolute inset-0 h-full w-full object-cover'
       />
-      <div className='absolute inset-0 bg-gradient-to-t from-purple-950/90 via-purple-900/40 to-fuchsia-900/10' />
+      <div className='absolute inset-0 bg-linear-to-t from-purple-950/90 via-purple-900/40 to-fuchsia-900/10' />
       {title && (
         <div className='relative container m-auto h-full px-6 flex flex-col justify-end pb-10'>
           {subtitle && (
-            <span className='mb-3 self-start rounded-full bg-white/15 px-4 py-1 text-sm font-medium text-fuchsia-100 ring-1 ring-white/25 backdrop-blur'>
+            <span className='mb-3 self-start rounded-full bg-white/15 px-4 py-1 text-sm font-medium text-fuchsia-100 ring-1 ring-white/25 backdrop-blur-sm'>
               {subtitle}
             </span>
           )}

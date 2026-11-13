@@ -5,7 +5,7 @@ import { useRouter } from 'next/navigation';
 import { FaSearch } from 'react-icons/fa';
 
 const fieldClass =
-  'w-full px-5 py-3.5 rounded-xl bg-white text-slate-800 placeholder-slate-400 focus:outline-none focus:ring-4 focus:ring-fuchsia-300/60';
+  'w-full px-5 py-3.5 rounded-xl bg-white text-slate-800 placeholder-slate-400 focus:outline-hidden focus:ring-4 focus:ring-fuchsia-300/60';
 
 const RecipeSearchForm = () => {
   const [searchCriteria, setSearchCriteria] = useState('');
