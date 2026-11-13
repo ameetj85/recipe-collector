@@ -95,7 +95,7 @@ const RecipeDetails = ({ recipe }) => {
             {nutrition.map(([label, value]) => (
               <div
                 key={label}
-                className='rounded-xl bg-gradient-to-br from-purple-50 to-fuchsia-50 py-3'
+                className='rounded-xl bg-linear-to-br from-purple-50 to-fuchsia-50 py-3'
               >
                 <FaFire className='mx-auto mb-1 text-fuchsia-400' />
                 <div className='text-lg font-bold text-purple-800'>{value}</div>
@@ -113,7 +113,7 @@ const RecipeDetails = ({ recipe }) => {
             {times.map(([label, value]) => (
               <div
                 key={label}
-                className='rounded-xl bg-gradient-to-br from-purple-50 to-fuchsia-50 py-3'
+                className='rounded-xl bg-linear-to-br from-purple-50 to-fuchsia-50 py-3'
               >
                 <FaClock className='mx-auto mb-1 text-purple-400' />
                 <div className='text-lg font-bold text-purple-800'>
@@ -146,7 +146,7 @@ const RecipeDetails = ({ recipe }) => {
         <ul className='grid grid-cols-1 sm:grid-cols-2 gap-x-6 gap-y-2'>
           {recipe.ingredients.map((i, index) => (
             <li key={index} className='flex items-start gap-3 text-slate-700'>
-              <span className='mt-2 h-2 w-2 flex-shrink-0 rounded-full bg-gradient-to-br from-purple-500 to-fuchsia-500' />
+              <span className='mt-2 h-2 w-2 shrink-0 rounded-full bg-linear-to-br from-purple-500 to-fuchsia-500' />
               {i}
             </li>
           ))}
@@ -158,7 +158,7 @@ const RecipeDetails = ({ recipe }) => {
         <ol className='space-y-4'>
           {directions.map((step, index) => (
             <li key={index} className='flex gap-4'>
-              <span className='flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-full bg-gradient-to-br from-purple-600 to-fuchsia-600 text-sm font-bold text-white shadow-md shadow-purple-500/30'>
+              <span className='flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-linear-to-br from-purple-600 to-fuchsia-600 text-sm font-bold text-white shadow-md shadow-purple-500/30'>
                 {index + 1}
               </span>
               <p className='pt-1 text-slate-700 leading-relaxed'>{step}</p>

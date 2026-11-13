@@ -1,7 +1,6 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
-import { useFormState } from "react-dom";
+import React, { useState, useEffect, useActionState } from "react";
 import { toast } from "react-toastify";
 import { updateRecipe } from "@/app/actions/recipes";
 import SubmitButton from "@/components/SubmitButton";
@@ -9,7 +8,7 @@ import SubmitButton from "@/components/SubmitButton";
 // `recipe` is loaded (and ownership checked) by app/recipes/[id]/edit/page.jsx
 const RecipeEditForm = ({ recipe }) => {
   // updateRecipe redirects to the recipe on success, or returns { error }
-  const [formState, formAction] = useFormState(
+  const [formState, formAction] = useActionState(
     updateRecipe.bind(null, recipe._id),
     {}
   );

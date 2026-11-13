@@ -32,7 +32,7 @@ const Navbar = () => {
   const pathname = usePathname();
 
   return (
-    <nav className='sticky top-0 z-40 bg-gradient-to-r from-purple-950 via-purple-800 to-fuchsia-800 shadow-lg shadow-purple-950/20'>
+    <nav className='sticky top-0 z-40 bg-linear-to-r from-purple-950 via-purple-800 to-fuchsia-800 shadow-lg shadow-purple-950/20'>
       <div className='mx-auto max-w-7xl px-2 sm:px-6 lg:px-8'>
         <div className='relative flex h-20 items-center justify-between'>
           <div className='absolute inset-y-0 left-0 flex items-center md:hidden'>
@@ -40,7 +40,7 @@ const Navbar = () => {
             <button
               type='button'
               id='mobile-dropdown-button'
-              className='relative inline-flex items-center justify-center rounded-full p-2 text-purple-200 hover:bg-white/10 hover:text-white focus:outline-none focus:ring-2 focus:ring-inset focus:ring-white'
+              className='relative inline-flex items-center justify-center rounded-full p-2 text-purple-200 hover:bg-white/10 hover:text-white focus:outline-hidden focus:ring-2 focus:ring-inset focus:ring-white'
               aria-controls='mobile-menu'
               aria-expanded={isMobileMenuOpen}
               onClick={() => setIsMobileMenuOpen((prev) => !prev)}
@@ -66,7 +66,7 @@ const Navbar = () => {
 
           <div className='flex flex-1 items-center justify-center md:items-stretch md:justify-start'>
             {/* <!-- Logo --> */}
-            <Link className='flex flex-shrink-0 items-center group' href='/'>
+            <Link className='flex shrink-0 items-center group' href='/'>
               <Image
                 className='h-11 w-11 rounded-full object-cover ring-2 ring-white/40 group-hover:ring-fuchsia-300 transition'
                 src={logo}
@@ -125,7 +125,7 @@ const Navbar = () => {
               <Link href='/messages' className='relative group'>
                 <button
                   type='button'
-                  className='relative rounded-full bg-white/10 p-2 text-purple-100 hover:bg-white/20 hover:text-white transition focus:outline-none focus:ring-2 focus:ring-white'
+                  className='relative rounded-full bg-white/10 p-2 text-purple-100 hover:bg-white/20 hover:text-white transition focus:outline-hidden focus:ring-2 focus:ring-white'
                 >
                   <span className='absolute -inset-1.5'></span>
                   <span className='sr-only'>View notifications</span>
@@ -152,7 +152,7 @@ const Navbar = () => {
                 <div>
                   <button
                     type='button'
-                    className='relative flex rounded-full text-sm ring-2 ring-white/40 hover:ring-fuchsia-300 transition focus:outline-none focus:ring-fuchsia-300'
+                    className='relative flex rounded-full text-sm ring-2 ring-white/40 hover:ring-fuchsia-300 transition focus:outline-hidden focus:ring-fuchsia-300'
                     id='user-menu-button'
                     aria-expanded={isProfileMenuOpen}
                     aria-haspopup='true'
@@ -174,7 +174,7 @@ const Navbar = () => {
                 {isProfileMenuOpen && (
                   <div
                     id='user-menu'
-                    className='absolute right-0 z-50 mt-3 w-52 origin-top-right overflow-hidden rounded-2xl bg-white py-2 shadow-2xl shadow-purple-900/20 ring-1 ring-purple-100 focus:outline-none'
+                    className='absolute right-0 z-50 mt-3 w-52 origin-top-right overflow-hidden rounded-2xl bg-white py-2 shadow-2xl shadow-purple-900/20 ring-1 ring-purple-100 focus:outline-hidden'
                     role='menu'
                     aria-orientation='vertical'
                     aria-labelledby='user-menu-button'

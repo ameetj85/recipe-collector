@@ -28,7 +28,7 @@ const RecipeCarousel = ({ recipes }) => {
           items.map((recipe, index) => (
             <div
               key={`${copy}-${index}-${recipe._id}`}
-              className='w-72 sm:w-80 flex-shrink-0 px-3'
+              className='w-72 sm:w-80 shrink-0 px-3'
               // The duplicate set only exists for the seamless loop.
               aria-hidden={copy === 1 ? 'true' : undefined}
             >

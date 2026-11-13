@@ -3,13 +3,13 @@
 import React from 'react';
 import {
   FacebookShareButton,
-  TwitterShareButton,
+  XShareButton,
   WhatsappShareButton,
   EmailShareButton,
-  FacebookIcon,
-  TwitterIcon,
-  WhatsappIcon,
-  EmailIcon,
+  FacebookLegacyIcon,
+  XLegacyIcon,
+  WhatsappLegacyIcon,
+  EmailLegacyIcon,
 } from 'react-share';
 
 const ShareButtons = ({ recipe }) => {
@@ -26,19 +26,19 @@ const ShareButtons = ({ recipe }) => {
           quote={recipe.name}
           hashtag={`#${recipe.type} Is Yummy`}
         >
-          <FacebookIcon size={40} round={true} />
+          <FacebookLegacyIcon size={40} round={true} />
         </FacebookShareButton>
 
-        <TwitterShareButton
+        <XShareButton
           url={shareUrl}
           title={recipe.name}
           hashtags={[`${recipe.type.trim()}IsYummy`]}
         >
-          <TwitterIcon size={40} round={true} />
-        </TwitterShareButton>
+          <XLegacyIcon size={40} round={true} />
+        </XShareButton>
 
         <WhatsappShareButton url={shareUrl} title={recipe.name} separator=':: '>
-          <WhatsappIcon size={40} round={true} />
+          <WhatsappLegacyIcon size={40} round={true} />
         </WhatsappShareButton>
 
         <EmailShareButton
@@ -48,7 +48,7 @@ const ShareButtons = ({ recipe }) => {
           subject={recipe.name}
           body={`Check out this recipe listing: `}
         >
-          <EmailIcon size={40} round={true} />
+          <EmailLegacyIcon size={40} round={true} />
         </EmailShareButton>
       </div>
     </div>

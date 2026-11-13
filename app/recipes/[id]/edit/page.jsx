@@ -4,9 +4,10 @@ import RecipeEditForm from '@/components/RecipeEditForm';
 import { getSessionUser } from '@/utils/getSessionUser';
 import { getRecipeById } from '@/utils/queries';
 
-const RecipeEditPage = async ({ params }) => {
+const RecipeEditPage = async (props) => {
+  const { id } = await props.params;
   const [recipe, sessionUser] = await Promise.all([
-    getRecipeById(params.id),
+    getRecipeById(id),
     getSessionUser(),
   ]);
 

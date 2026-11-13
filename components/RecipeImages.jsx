@@ -17,7 +17,7 @@ const RecipeImages = ({ images }) => {
             className='object-cover h-[400px] w-full mx-auto rounded-2xl shadow-xl shadow-purple-900/10 ring-1 ring-purple-100'
             width={1800}
             height={400}
-            priority
+            preload
           />
         ) : (
           <div className='grid grid-cols-1 sm:grid-cols-2 gap-6'>
@@ -39,7 +39,7 @@ const RecipeImages = ({ images }) => {
                   sizes='100vw'
                   width={0}
                   height={0}
-                  priority
+                  preload
                 />
               </div>
             ))}

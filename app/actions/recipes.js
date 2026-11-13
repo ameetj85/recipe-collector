@@ -48,7 +48,7 @@ const recipeFieldsFromForm = (formData) => ({
   ingredients: parseIngredients(formData.get('ingredients')),
 });
 
-// Create a recipe, then redirect to it. Used with useFormState, so it takes
+// Create a recipe, then redirect to it. Used with useActionState, so it takes
 // (prevState, formData) and returns { error } on failure.
 export async function addRecipe(prevState, formData) {
   const sessionUser = await getSessionUser();
