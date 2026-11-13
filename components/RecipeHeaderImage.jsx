@@ -1,19 +1,19 @@
 import React from 'react';
+import Image from 'next/image';
+import { imageSrc } from '@/utils/imageSrc';
 
 const RecipeHeaderImage = ({ image, title, subtitle }) => {
-  // We want to retain our test recipes, whose images are stored on disc.
-  // We also want to show our images that stared in Cloudinary.
-  let imagePath = `/images/recipes/${image}`;
-  if (image.includes('http')) {
-    imagePath = image;
-  }
-
   return (
     <section className='relative h-[320px] md:h-[440px] overflow-hidden'>
-      <img
-        src={imagePath}
+      {/* Full-bleed: sizes="100vw" lets next/image pick a variant that
+          matches the screen width (and DPR) instead of sending the original. */}
+      <Image
+        src={imageSrc(image)}
         alt=''
-        className='absolute inset-0 h-full w-full object-cover'
+        fill
+        sizes='100vw'
+        preload
+        className='object-cover'
       />
       <div className='absolute inset-0 bg-linear-to-t from-purple-950/90 via-purple-900/40 to-fuchsia-900/10' />
       {title && (

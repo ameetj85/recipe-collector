@@ -54,6 +54,17 @@ COPY --from=builder /app/public ./public
 COPY --from=builder --chown=nextjs:nodejs /app/.next/standalone ./
 COPY --from=builder --chown=nextjs:nodejs /app/.next/static ./.next/static
 
+# better-sqlite3 ships prebuilt binaries (incl. linuxmusl-x64 for Alpine), so
+# no compiler toolchain is needed. Output tracing already copies the matching
+# binary; copying the whole package makes sure, and lets the backup script run.
+COPY --from=builder --chown=nextjs:nodejs /app/node_modules/better-sqlite3 ./node_modules/better-sqlite3
+COPY --from=builder --chown=nextjs:nodejs /app/scripts/backup-db.mjs ./scripts/backup-db.mjs
+
+# SQLite database lives on a volume: docker run -v recipe-data:/app/data ...
+RUN mkdir -p /app/data && chown nextjs:nodejs /app/data
+ENV SQLITE_PATH=/app/data/recipes.db
+VOLUME /app/data
+
 USER nextjs
 
 EXPOSE 9000

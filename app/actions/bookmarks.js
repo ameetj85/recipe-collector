@@ -1,9 +1,9 @@
 'use server';
 
-import { isValidObjectId } from 'mongoose';
 import { revalidatePath } from 'next/cache';
-import connectDB from '@/config/database';
-import User from '@/models/User';
+import * as users from '@/models/users';
+import * as recipes from '@/models/recipes';
+import { normalizeId } from '@/utils/ids';
 import { getSessionUser } from '@/utils/getSessionUser';
 
 // Add or remove a bookmark. Returns { message, isBookmarked } or { error }.
@@ -12,32 +12,23 @@ export async function toggleBookmark(recipeId) {
   if (!sessionUser?.userId) {
     return { error: 'You need to sign in to bookmark a recipe.' };
   }
-  if (!isValidObjectId(recipeId)) {
+  const id = normalizeId(recipeId);
+  if (!id) {
     return { error: 'Recipe not found.' };
   }
 
   try {
-    await connectDB();
-
-    const user = await User.findById(sessionUser.userId);
-    if (!user) {
+    if (!users.findById(sessionUser.userId)) {
       return { error: 'User not found.' };
     }
-
-    let isBookmarked = user.bookmarks.includes(recipeId);
-    let message;
-
-    if (isBookmarked) {
-      user.bookmarks.pull(recipeId);
-      message = 'Bookmark removed successfully.';
-      isBookmarked = false;
-    } else {
-      user.bookmarks.push(recipeId);
-      message = 'Bookmark added successfully!';
-      isBookmarked = true;
+    if (!recipes.findOwnerId(id)) {
+      return { error: 'Recipe not found.' };
     }
 
-    await user.save();
+    const isBookmarked = users.toggleBookmark(sessionUser.userId, id);
+    const message = isBookmarked
+      ? 'Bookmark added successfully!'
+      : 'Bookmark removed successfully.';
 
     revalidatePath('/recipes/saved');
     return { message, isBookmarked };

@@ -26,3 +26,8 @@ Thumbs.db
 .git
 .next
 npm-debug.log
+# SQLite data (mounted as a volume, never baked into the image)
+data
+*.db
+*.db-wal
+*.db-shm
