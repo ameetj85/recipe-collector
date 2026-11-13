@@ -45,7 +45,10 @@ const Message = ({ message }) => {
 
       if (res.status === 201) {
         setIsDeleted(true);
-        setUnreadCount((prevCount) => prevCount - 1);
+        // only an unread message contributes to the unread count
+        if (!isRead) {
+          setUnreadCount((prevCount) => Math.max(prevCount - 1, 0));
+        }
         toast.success('Message Deleted');
       }
     } catch (error) {

@@ -1,6 +1,12 @@
 import connectDB from '@/config/database';
 import Recipe from '@/models/Recipe';
 import { getSessionUser } from '@/utils/getSessionUser';
+import User from '@/models/User';
+import Message from '@/models/Message';
+import { uploadImages, deleteImages } from '@/utils/cloudinaryImages';
+import { parseIngredients } from '@/utils/parseIngredients';
+
+const MAX_IMAGES = 2;
 
 // GET /api/recipes/:id
 export const GET = async (req, { params }) => {
@@ -46,6 +52,17 @@ export const DELETE = async (request, { params }) => {
     }
 
     await recipe.deleteOne();
+
+    // Clean up everything that referenced this recipe:
+    // other users' bookmarks, messages about it, and its Cloudinary images.
+    await Promise.all([
+      User.updateMany(
+        { bookmarks: recipe._id },
+        { $pull: { bookmarks: recipe._id } }
+      ),
+      Message.deleteMany({ property: recipe._id }),
+      deleteImages(recipe.images),
+    ]);
 
     return new Response('Recipe Deleted', {
       status: 200,
@@ -109,16 +126,29 @@ export const PUT = async (req, { params }) => {
         protein: formData.get('nutritionInfo.protein'),
         sugars: formData.get('nutritionInfo.sugars'),
       },
-      ingredients: formData.get('ingredients').split('\r\n'),
+      ingredients: parseIngredients(formData.get('ingredients')),
     };
 
-    // update recipe in db
-    const filter = { _id: existingRecipe._id.toString() };
-    const options = { upsert: true };
+    // Optional new images: if any are supplied they replace the existing
+    // ones; otherwise the current images are kept.
+    const newImageFiles = formData
+      .getAll('images')
+      .filter((image) => typeof image === 'object' && image.name != '')
+      .slice(0, MAX_IMAGES);
 
-    const updatedRecipe = await Recipe.updateOne(filter, recipeData, options);
+    let oldImagesToDelete = [];
+    if (newImageFiles.length > 0) {
+      recipeData.images = await uploadImages(newImageFiles);
+      oldImagesToDelete = existingRecipe.images;
+    }
 
-    // const updatedRecipe = await Recipe.findByIdAndUpdate(id, recipeData);
+    // update recipe in db (recipe is known to exist, so no upsert)
+    const updatedRecipe = await Recipe.findByIdAndUpdate(id, recipeData, {
+      new: true,
+    });
+
+    // remove replaced images only after the DB update succeeded
+    await deleteImages(oldImagesToDelete);
 
     return new Response(JSON.stringify(updatedRecipe), {
       status: 200,
