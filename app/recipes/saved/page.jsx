@@ -1,40 +1,14 @@
-'use client';
-
-import React, { useEffect, useState } from 'react';
+import React from 'react';
 import RecipeCard from '@/components/RecipeCard';
-import Spinner from '@/components/Spinner';
-import { toast } from 'react-toastify';
+import { getSessionUser } from '@/utils/getSessionUser';
+import { getBookmarkedRecipes } from '@/utils/queries';
 
-const SavedRecipesPage = () => {
-  const [recipes, setRecipes] = useState([]);
-  const [loading, setLoading] = useState(true);
+const SavedRecipesPage = async () => {
+  // middleware.js guards this route, so a session is expected
+  const sessionUser = await getSessionUser();
+  const recipes = await getBookmarkedRecipes(sessionUser?.userId);
 
-  useEffect(() => {
-    const fetchSavedRecipes = async () => {
-      try {
-        const res = await fetch(`/api/bookmarks`);
-
-        if (res.status === 200) {
-          const data = await res.json();
-          setRecipes(data);
-        } else {
-          console.log(res.statusText);
-          toast.error('Failed to fetch saved recipes: ' + res.status);
-        }
-      } catch (error) {
-        console.log(error);
-        toast.error('Failed to fetch saved recipes!');
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchSavedRecipes();
-  }, []);
-
-  return loading ? (
-    <Spinner loading={loading} />
-  ) : (
+  return (
     <section className='page-bg min-h-[60vh] px-4 py-12'>
       <div className='container-xl lg:container m-auto px-4'>
         <h1 className='font-display text-4xl font-bold gradient-text mb-2'>

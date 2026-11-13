@@ -5,8 +5,10 @@ import { createContext, useContext, useState } from 'react';
 const GlobalContext = createContext();
 
 // Create a provider
-export function GlobalProvider({ children }) {
-  const [unreadCount, setUnreadCount] = useState(0);
+// initialUnreadCount is loaded on the server by app/layout.jsx; afterwards the
+// client keeps it in sync (see components/Message.jsx).
+export function GlobalProvider({ children, initialUnreadCount = 0 }) {
+  const [unreadCount, setUnreadCount] = useState(initialUnreadCount);
 
   return (
     <GlobalContext.Provider

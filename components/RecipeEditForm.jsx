@@ -1,41 +1,33 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
-import { useParams, useRouter } from "next/navigation";
+import { useFormState } from "react-dom";
 import { toast } from "react-toastify";
-import { fetchRecipe, fetchRecipes } from "@/utils/requests";
+import { updateRecipe } from "@/app/actions/recipes";
+import SubmitButton from "@/components/SubmitButton";
 
-const RecipeEditForm = () => {
-  const { id } = useParams();
-  const router = useRouter();
+// `recipe` is loaded (and ownership checked) by app/recipes/[id]/edit/page.jsx
+const RecipeEditForm = ({ recipe }) => {
+  // updateRecipe redirects to the recipe on success, or returns { error }
+  const [formState, formAction] = useFormState(
+    updateRecipe.bind(null, recipe._id),
+    {}
+  );
 
-  const [mounted, setMounted] = useState(false);
-  const [fields, setFields] = useState({
-    owner: "",
-    name: "",
-    description: "",
-    url: "",
-    starRating: "",
-    category: "",
-    type: "",
-    isFeatured: false,
-    prepTime: 0,
-    cookTime: 0,
-    totalTime: 0,
-    servings: 0,
-    directions: "",
-    nutritionInfo: {
-      calories: 0,
-      fat: 0,
-      carbs: 0,
-      protein: 0,
-      sugars: 0,
-    },
-    ingredients: [],
-    images: [],
-  });
+  useEffect(() => {
+    if (formState?.error) toast.error(formState.error);
+  }, [formState]);
 
-  const [loading, setLoading] = useState(true);
+  // ingredients are stored as an array; the textarea needs one per line
+  // (otherwise React joins the array with commas and saving merges them)
+  const [fields, setFields] = useState(() => ({
+    ...recipe,
+    nutritionInfo: { ...recipe.nutritionInfo },
+    ingredients: Array.isArray(recipe.ingredients)
+      ? recipe.ingredients.map((i) => i.trim()).join("\n")
+      : recipe.ingredients || "",
+  }));
+
   const [invalidImageCount, setInvalidImageCount] = useState(false);
 
   const handleImageChange = (e) => {
@@ -71,61 +63,8 @@ const RecipeEditForm = () => {
     }
   };
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-
-    try {
-      const formData = new FormData(e.target);
-
-      const res = await fetch(`/api/recipes/${id}`, {
-        method: "PUT",
-        body: formData,
-      });
-
-      if (res.status === 200) {
-        router.push(`/recipes/${id}`);
-      } else if (res.status === 401 || res.status === 403) {
-        toast.error("Permission denied.");
-      } else {
-        toast.error("Something went wrong.");
-      }
-    } catch (error) {
-      toast.error("Something went wrong.");
-      console.log(error);
-    }
-  };
-
-  // this prevents console warnings to show up at runtime complaining about html and server.
-  useEffect(() => {
-    setMounted(true);
-
-    // fetch recipe data for form
-    const fetchRecipeData = async () => {
-      try {
-        const recipeData = await fetchRecipe(id);
-        if (!recipeData) return;
-
-        // ingredients are stored as an array; the textarea needs one per line
-        // (otherwise React joins the array with commas and saving merges them)
-        setFields({
-          ...recipeData,
-          ingredients: Array.isArray(recipeData.ingredients)
-            ? recipeData.ingredients.map((i) => i.trim()).join("\n")
-            : recipeData.ingredients || "",
-        });
-      } catch (error) {
-        console.error(error);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchRecipeData();
-  }, []);
-
   return (
-    mounted && (
-      <form onSubmit={handleSubmit}>
+    <form action={formAction}>
         <h2 className="font-display text-4xl text-center font-bold gradient-text mb-10">Edit Recipe</h2>
 
         <div className="form-group">
@@ -454,15 +393,14 @@ const RecipeEditForm = () => {
         </div>
 
         <div>
-          <button
+          <SubmitButton
             className="btn-primary w-full py-3.5 text-lg mt-4"
-            type="submit"
+            pendingText="Updating Recipe..."
           >
             Update Recipe
-          </button>
+          </SubmitButton>
         </div>
       </form>
-    )
   );
 };
 

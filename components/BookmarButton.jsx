@@ -1,78 +1,41 @@
-import React, { useState, useEffect } from 'react';
+'use client';
+
+import React, { useState, useTransition } from 'react';
 import { FaBookmark } from 'react-icons/fa';
 import { useSession } from 'next-auth/react';
 import { toast } from 'react-toastify';
+import { toggleBookmark } from '@/app/actions/bookmarks';
 
-const BookmarkButton = ({ recipe }) => {
+// initialIsBookmarked is resolved on the server by the recipe page.
+const BookmarkButton = ({ recipe, initialIsBookmarked = false }) => {
   const { data: session } = useSession();
   const userId = session?.user?.id;
-  const [isBookmarked, setIsBookmarked] = useState(false);
-  const [loading, setLoading] = useState(true);
+  const [isBookmarked, setIsBookmarked] = useState(initialIsBookmarked);
+  const [isPending, startTransition] = useTransition();
 
-  useEffect(() => {
-    if (!userId) {
-      setLoading(false);
-      return;
-    }
-
-    const checkBookmarkStatus = async () => {
-      try {
-        const res = await fetch(`/api/bookmarks/check`, {
-          method: 'POST',
-          headers: {
-            'content-type': 'application/json',
-          },
-          body: JSON.stringify({ recipeId: recipe._id }),
-        });
-
-        if (res.status === 200) {
-          const data = await res.json();
-          setIsBookmarked(data.isBookmarked);
-        }
-      } catch (error) {
-        console.log(error);
-      } finally {
-        setLoading(false);
-      }
-    };
-    checkBookmarkStatus();
-  }, [recipe._id, userId]);
-
-  const onHandleClick = async () => {
+  const onHandleClick = () => {
     if (!userId) {
       toast.error('You need to sign in to bookmark a recipe.');
       return;
     }
 
-    try {
-      const res = await fetch(`/api/bookmarks`, {
-        method: 'POST',
-        headers: {
-          'content-type': 'application/json',
-        },
-        body: JSON.stringify({ recipeId: recipe._id }),
-      });
+    startTransition(async () => {
+      const result = await toggleBookmark(recipe._id);
 
-      if (res.status === 200) {
-        const data = await res.json();
-        toast.success(data.message);
-        setIsBookmarked(data.isBookmarked);
+      if (result.error) {
+        toast.error(result.error);
+        return;
       }
-    } catch (error) {
-      console.log(error);
-      toast.error('Something went wrong.');
-    }
-  };
 
-  if (loading) {
-    return (
-      <div className='h-12 w-full animate-pulse rounded-full bg-purple-100' />
-    );
-  }
+      setIsBookmarked(result.isBookmarked);
+      toast.success(result.message);
+    });
+  };
 
   return isBookmarked ? (
     <button
       onClick={onHandleClick}
+      disabled={isPending}
       className='btn-secondary w-full py-3'
     >
       <FaBookmark /> Remove Bookmark
@@ -80,6 +43,7 @@ const BookmarkButton = ({ recipe }) => {
   ) : (
     <button
       onClick={onHandleClick}
+      disabled={isPending}
       className='btn-primary w-full py-3'
     >
       <FaBookmark /> Bookmark Recipe

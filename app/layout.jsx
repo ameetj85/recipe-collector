@@ -8,6 +8,7 @@ import 'react-toastify/dist/ReactToastify.css';
 import { GlobalProvider } from '@/context/GlobalContext';
 import { getServerSession } from 'next-auth/next';
 import { authOptions } from '@/utils/authOptions';
+import { getUnreadMessageCount } from '@/utils/queries';
 
 export const metadata = {
   title: 'Recepi App | Find the perfect recipe',
@@ -28,8 +29,11 @@ const MainLayout = async ({ children }) => {
     console.error('Failed to load session in layout:', error);
   }
 
+  // Seed the Navbar's unread-message badge (returns 0 on failure).
+  const unreadCount = await getUnreadMessageCount(session?.user?.id);
+
   return (
-    <GlobalProvider>
+    <GlobalProvider initialUnreadCount={unreadCount}>
       <AuthProvider session={session}>
         <html lang='en'>
           <body>

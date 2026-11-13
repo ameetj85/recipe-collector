@@ -1,7 +1,10 @@
-import React, { useState } from 'react';
+'use client';
+
+import React, { useState, useTransition } from 'react';
 import { FaPaperPlane } from 'react-icons/fa';
 import { toast } from 'react-toastify';
 import { useSession } from 'next-auth/react';
+import { sendMessage } from '@/app/actions/messages';
 
 const RecipeContactForm = ({ recipe }) => {
   const { data: session } = useSession();
@@ -10,46 +13,33 @@ const RecipeContactForm = ({ recipe }) => {
   const [message, setMessage] = useState('');
   const [phone, setPhone] = useState('');
   const [wasSubmitted, setWasSubmitted] = useState(false);
+  const [isPending, startTransition] = useTransition();
 
-  const handleSubmit = async (e) => {
+  const handleSubmit = (e) => {
     e.preventDefault();
 
-    const data = {
-      name,
-      email,
-      phone,
-      message,
-      recipient: recipe.owner,
-      recipe: recipe._id,
-    };
-
-    try {
-      const res = await fetch('/api/messages', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(data),
+    startTransition(async () => {
+      // the recipient is resolved on the server from the recipe's owner
+      const result = await sendMessage({
+        recipeId: recipe._id,
+        name,
+        email,
+        phone,
+        message,
       });
 
-      if (res.status === 200) {
-        toast.success('Message sent successfully');
-        setWasSubmitted(true);
-      } else if (res.status === 400 || res.status === 401) {
-        const dataObj = await res.json();
-        toast.error(dataObj.message);
-      } else {
-        toast.error('Error sending message');
+      if (result.error) {
+        toast.error(result.error);
+        return;
       }
-    } catch (error) {
-      console.log(error);
-      toast.error('Error sending message');
-    } finally {
+
+      toast.success('Message sent successfully');
+      setWasSubmitted(true);
       setName('');
       setEmail('');
       setPhone('');
       setMessage('');
-    }
+    });
   };
 
   return (
@@ -79,7 +69,8 @@ const RecipeContactForm = ({ recipe }) => {
               id='name'
               type='text'
               placeholder='Enter your name'
-              requiredvalue={name}
+              required
+              value={name}
               onChange={(e) => setName(e.target.value)}
             />
           </div>
@@ -135,8 +126,9 @@ const RecipeContactForm = ({ recipe }) => {
             <button
               className='btn-primary w-full py-3'
               type='submit'
+              disabled={isPending}
             >
-              <FaPaperPlane /> Send Message
+              <FaPaperPlane /> {isPending ? 'Sending...' : 'Send Message'}
             </button>
           </div>
         </form>

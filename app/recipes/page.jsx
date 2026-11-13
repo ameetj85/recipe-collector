@@ -1,10 +1,10 @@
 import React from 'react';
 import RecipeCard from '@/components/RecipeCard';
-import { fetchRecipes } from '@/utils/requests';
+import { getRecipes } from '@/utils/queries';
 import RecipeSearchForm from '@/components/RecipeSearchForm';
 
 const RecipesPage = async () => {
-  const recipes = await fetchRecipes();
+  const recipes = await getRecipes();
 
   // sort recipes by name
   recipes.sort((a, b) => {
