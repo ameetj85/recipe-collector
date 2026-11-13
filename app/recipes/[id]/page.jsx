@@ -41,8 +41,8 @@ const RecipePage = () => {
 
   if (!recipe && !loading) {
     return (
-      <h1 className='text-center text-2xl font-bold mt-10'>
-        Recipe Not Found!!
+      <h1 className='font-display text-center text-3xl font-bold mt-16 gradient-text'>
+        Recipe Not Found
       </h1>
     );
   }
@@ -53,26 +53,30 @@ const RecipePage = () => {
 
       {!loading && recipe && (
         <>
-          <RecipeHeaderImage image={recipe.images[0]} />
+          <RecipeHeaderImage
+            image={recipe.images[0]}
+            title={recipe.name}
+            subtitle={`${recipe.category} · ${recipe.type}`}
+          />
 
-          <section>
-            <div className='container m-auto py-6 px-6'>
+          <section className='page-bg'>
+            <div className='container m-auto pt-6 px-6'>
               <Link
                 href='/recipes'
-                className='text-blue-500 hover:text-blue-600 flex items-center'
+                className='inline-flex items-center font-medium text-purple-600 hover:text-fuchsia-600'
               >
                 <FaArrowLeft className='mr-2'></FaArrowLeft> Back to Recipes
               </Link>
             </div>
           </section>
 
-          <section className='bg-blue-50'>
-            <div className='container m-auto py-10 px-6'>
+          <section className='page-bg'>
+            <div className='container m-auto py-8 px-6'>
               <div className='grid grid-cols-1 md:grid-cols-70/30 w-full gap-6'>
                 <RecipeDetails recipe={recipe} />
 
                 {/* <!-- Sidebar --> */}
-                <aside className='space-y-4'>
+                <aside className='space-y-6 md:sticky md:top-28 self-start'>
                   <BookmarkButton recipe={recipe} />
                   <ShareButtons recipe={recipe} />
                   <RecipeContactForm recipe={recipe} />

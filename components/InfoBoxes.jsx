@@ -1,18 +1,19 @@
 import React from 'react';
+import { FaBookOpen, FaPlusCircle } from 'react-icons/fa';
 import InfoBox from './InfoBox';
 
 const InfoBoxes = () => {
   return (
-    <section>
+    <section className='relative z-10 -mt-12 px-4'>
       <div className='container-xl lg:container m-auto'>
-        <div className='grid grid-cols-1 md:grid-cols-2 gap-4 p-4 rounded-lg'>
+        <div className='grid grid-cols-1 md:grid-cols-2 gap-6'>
           <InfoBox
-            heading='Browse'
-            backgroundColor='bg-gray-100'
+            heading='Browse Recipes'
+            icon={<FaBookOpen />}
+            variant='light'
             buttonInfo={{
-              text: 'Browse Recipe',
+              text: 'Browse Recipes',
               link: '/recipes',
-              backgroundColor: 'bg-black',
             }}
           >
             Find the inspiration for your next meal. Bookmark recipes and
@@ -21,11 +22,11 @@ const InfoBoxes = () => {
 
           <InfoBox
             heading='For Recipe Owners'
-            backgroundColor='bg-blue-100'
+            icon={<FaPlusCircle />}
+            variant='dark'
             buttonInfo={{
               text: 'Add Recipe',
               link: '/recipes/add',
-              backgroundColor: 'bg-blue-500',
             }}
           >
             Add your recipes and expand the community of users.

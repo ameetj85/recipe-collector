@@ -45,28 +45,32 @@ const SearchResultsPage = () => {
 
   return (
     <>
-      <section className='bg-blue-700 py-4'>
-        <div className='max-w-7xl mx-auto px-4 flex flex-col items-start sm:px-6 lg:px-8'>
+      <section className='gradient-hero py-10'>
+        <div className='max-w-7xl mx-auto px-4 sm:px-6 lg:px-8'>
           <RecipeSearchForm />
         </div>
       </section>
       {loading ? (
         <Spinner loading={loading} />
       ) : (
-        <section className='px-4 py-6'>
-          <div className='container-xl lg:container m-auto px-4 py-6'>
+        <section className='page-bg min-h-[60vh] px-4 py-10'>
+          <div className='container-xl lg:container m-auto px-4'>
             <Link
               href='/recipes'
-              className='flex items-center text-blue-500 hover:underline mb-3'
+              className='inline-flex items-center text-purple-600 hover:text-fuchsia-600 font-medium mb-4'
             >
-              <FaArrowAltCircleLeft className='mr-2 mb-1' />
+              <FaArrowAltCircleLeft className='mr-2' />
               Back to Recipes
             </Link>
-            <h1 className='text-2xl mb-4'>Search Results</h1>
+            <h1 className='font-display text-4xl font-bold gradient-text mb-8'>
+              Search Results
+            </h1>
             {recipes.length === 0 ? (
-              <p>No search results found</p>
+              <div className='panel p-10 text-center text-purple-700'>
+                No search results found
+              </div>
             ) : (
-              <div className='grid grid-cols-1 md:grid-cols-3 gap-6'>
+              <div className='grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8'>
                 {recipes.map((recipe) => (
                   <RecipeCard key={recipe._id} recipe={recipe} />
                 ))}

@@ -14,9 +14,11 @@ const ShareButtons = ({ recipe }) => {
   const shareUrl = `${process.env.NEXT_PUBLIC_DOMAIN}/recipes/${recipe._id}`;
 
   return (
-    <>
-      <h3 className='text-xl.font-bold.text-center.pt-2'>Share this Recipe</h3>
-      <div className='flex gap-3 justify-center pb-5'>
+    <div className='panel p-6'>
+      <h3 className='font-display text-xl font-bold text-purple-950 text-center mb-4'>
+        Share this Recipe
+      </h3>
+      <div className='flex gap-3 justify-center'>
         <FacebookShareButton
           url={shareUrl}
           quote={recipe.name}
@@ -47,7 +49,7 @@ const ShareButtons = ({ recipe }) => {
           <EmailIcon size={40} round={true} />
         </EmailShareButton>
       </div>
-    </>
+    </div>
   );
 };
 

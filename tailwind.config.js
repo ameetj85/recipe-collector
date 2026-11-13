@@ -9,6 +9,7 @@ module.exports = {
     extend: {
       fontFamily: {
         sans: ['Poppins', 'sans-serif'],
+        display: ['"Playfair Display"', 'Georgia', 'serif'],
       },
       gridTemplateColumns: {
         '70/30': '70% 28%',
