@@ -163,7 +163,7 @@ const RecipeAddForm = () => {
 
         <div className="mb-4">
           <label htmlFor="type" className="block text-gray-700 font-bold mb-2">
-            Cusisine Category
+            Cuisine Category
           </label>
           <select
             id="category"
@@ -243,7 +243,7 @@ const RecipeAddForm = () => {
             id="starRating"
             name="starRating"
             className="border rounded w-full py-2 px-3 mb-2"
-            placeholder="Telkl us how much you loved this recipe. Between 1 and 5 stars."
+            placeholder="Tell us how much you loved this recipe. Between 1 and 5 stars."
             required
             value={fields.starRating}
             onChange={handleChange}
@@ -310,7 +310,7 @@ const RecipeAddForm = () => {
             id="servings"
             name="servings"
             className="border rounded w-full py-2 px-3 mb-2"
-            placeholder="How many servings does this dish provie?"
+            placeholder="How many servings does this dish provide?"
             value={fields.servings}
             onChange={handleChange}
           />
@@ -374,7 +374,7 @@ const RecipeAddForm = () => {
             </label>
             <input
               type="number"
-              id="prrotein"
+              id="protein"
               name="nutritionInfo.protein"
               className="border rounded w-full py-2 px-3"
               value={fields.nutritionInfo.protein}

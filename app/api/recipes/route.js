@@ -77,7 +77,7 @@ export const POST = async (req) => {
       const imageArray = Array.from(new Uint8Array(imageBuffer));
       const imageData = Buffer.from(imageArray);
 
-      // converttheimage data to base64
+      // convert the image data to base64
       const imageBase64 = imageData.toString('base64');
 
       // make request to upload to cloudinary
