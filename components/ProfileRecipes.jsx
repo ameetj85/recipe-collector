@@ -5,6 +5,7 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { toast } from 'react-toastify';
 import { deleteRecipe } from '@/app/actions/recipes';
+import { imageSrc } from '@/utils/imageSrc';
 
 const toastOptions = {
   autoClose: false,
@@ -54,14 +55,11 @@ const ProfileRecipes = ({ recipes }) => {
           <Link href={`/recipes/${recipe._id}`}>
             <Image
               className='h-40 w-full object-cover'
-              src={
-                recipe.images[0].includes('http')
-                  ? recipe.images[0]
-                  : `/images/recipes/${recipe.images[0]}`
-              }
+              src={imageSrc(recipe.images[0])}
               alt=''
               width={500}
               height={100}
+              sizes='(min-width: 1024px) 50vw, 100vw'
               preload
             />
           </Link>

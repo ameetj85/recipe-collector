@@ -1,24 +1,28 @@
-import mongoose from 'mongoose';
+// SQLite connection. getDb() opens the database lazily on first use (never at
+// module load, so `next build` doesn't touch it) and caches the handle on
+// globalThis so it survives dev-server hot reloads.
+import fs from 'node:fs';
+import path from 'node:path';
+import Database from 'better-sqlite3';
+import { applyPragmas, ensureSchema } from '../db/schema.mjs';
 
-let connected = false;
+// turbopackIgnore: the path is only known at runtime; without the hint the
+// build traces the whole project (including data/) into .next/standalone.
+export const getDbPath = () =>
+  path.resolve(
+    /* turbopackIgnore: true */ process.env.SQLITE_PATH || './data/recipes.db'
+  );
 
-const connectDB = async () => {
-  mongoose.set('strictQuery', true);
+export function getDb() {
+  if (!globalThis.__recipeDb) {
+    const dbPath = getDbPath();
+    fs.mkdirSync(path.dirname(dbPath), { recursive: true });
 
-  // if db is already connected dont reconnect
-  if (connected) {
-    console.log('Mongo DB is already connected.');
-    return;
+    const db = new Database(dbPath);
+    applyPragmas(db);
+    ensureSchema(db);
+
+    globalThis.__recipeDb = db;
   }
-
-  // connect to Mongo DB
-  try {
-    await mongoose.connect(process.env.MONGODB_URI);
-    connected = true;
-    console.log('Mongo DB connected.');
-  } catch (error) {
-    console.log(error);
-  }
-};
-
-export default connectDB;
+  return globalThis.__recipeDb;
+}

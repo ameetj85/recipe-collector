@@ -1,10 +1,9 @@
 'use server';
 
-import { isValidObjectId } from 'mongoose';
 import { revalidatePath } from 'next/cache';
-import connectDB from '@/config/database';
-import Message from '@/models/Message';
-import Recipe from '@/models/Recipe';
+import * as messages from '@/models/messages';
+import * as recipes from '@/models/recipes';
+import { normalizeId } from '@/utils/ids';
 import { getSessionUser } from '@/utils/getSessionUser';
 
 // Send a message to a recipe's owner. The recipient is looked up from the
@@ -14,30 +13,32 @@ export async function sendMessage({ recipeId, name, email, phone, message }) {
   if (!sessionUser?.userId) {
     return { error: 'You must be logged in to send a message!' };
   }
-  if (!isValidObjectId(recipeId)) {
+  const id = normalizeId(recipeId);
+  if (!id) {
     return { error: 'Recipe not found.' };
+  }
+  if (!name || !email) {
+    return { error: 'Name and email are required.' };
   }
 
   try {
-    await connectDB();
-
-    const recipe = await Recipe.findById(recipeId).select('owner').lean();
-    if (!recipe) {
+    const ownerId = recipes.findOwnerId(id);
+    if (!ownerId) {
       return { error: 'Recipe not found.' };
     }
 
-    if (recipe.owner.toString() === sessionUser.userId) {
+    if (ownerId === sessionUser.userId) {
       return { error: 'Cannot send a message to yourself!' };
     }
 
-    await Message.create({
-      sender: sessionUser.userId,
-      recipient: recipe.owner,
-      property: recipe._id,
-      name,
-      email,
-      phone,
-      body: message,
+    messages.create({
+      senderId: sessionUser.userId,
+      recipientId: ownerId,
+      recipeId: id,
+      name: String(name),
+      email: String(email),
+      phone: phone ? String(phone) : null,
+      body: message ? String(message) : null,
     });
 
     return { message: 'Message sent successfully!' };
@@ -47,40 +48,39 @@ export async function sendMessage({ recipeId, name, email, phone, message }) {
   }
 }
 
-// Load a message the current user received, or return { error }.
+// Check that the message exists and belongs to the current user.
+// Returns { id } or { error }.
 async function findOwnMessage(messageId) {
   const sessionUser = await getSessionUser();
   if (!sessionUser?.userId) {
     return { error: 'You must be signed in.' };
   }
-  if (!isValidObjectId(messageId)) {
+  const id = normalizeId(messageId);
+  if (!id) {
     return { error: 'Message not found!' };
   }
 
-  await connectDB();
-
-  const message = await Message.findById(messageId);
+  const message = messages.findById(id);
   if (!message) {
     return { error: 'Message not found!' };
   }
-  if (message.recipient.toString() !== sessionUser.userId) {
+  if (message.recipient_id !== sessionUser.userId) {
     return { error: 'Unauthorised!' };
   }
 
-  return { message };
+  return { id };
 }
 
 // Toggle a message between read and unread. Returns { read } or { error }.
 export async function toggleMessageRead(messageId) {
   try {
-    const { message, error } = await findOwnMessage(messageId);
+    const { id, error } = await findOwnMessage(messageId);
     if (error) return { error };
 
-    message.read = !message.read;
-    await message.save();
+    const read = messages.toggleRead(id);
 
     revalidatePath('/messages');
-    return { read: message.read };
+    return { read };
   } catch (error) {
     console.error('Failed to update message:', error);
     return { error: 'Something went wrong' };
@@ -90,10 +90,10 @@ export async function toggleMessageRead(messageId) {
 // Delete a message. Returns { ok: true } or { error }.
 export async function deleteMessage(messageId) {
   try {
-    const { message, error } = await findOwnMessage(messageId);
+    const { id, error } = await findOwnMessage(messageId);
     if (error) return { error };
 
-    await message.deleteOne();
+    messages.remove(id);
 
     revalidatePath('/messages');
     return { ok: true };

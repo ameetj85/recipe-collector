@@ -2,6 +2,7 @@ import React from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { FaStar, FaArrowRight } from 'react-icons/fa';
+import { imageSrc } from '@/utils/imageSrc';
 
 const NUTRIENTS = [
   ['calories', 'Cal'],
@@ -11,12 +12,7 @@ const NUTRIENTS = [
 ];
 
 const RecipeCard = ({ recipe }) => {
-  // We want to retain our test recipe, whose images are stored on disc.
-  // We also want to show our images that stared in Cloudinary.
-  let imagePath = `/images/recipes/${recipe.images[0]}`;
-  if (recipe.images[0].includes('https')) {
-    imagePath = recipe.images[0];
-  }
+  const imagePath = imageSrc(recipe.images[0]);
 
   const rating = Math.max(0, Math.min(5, Math.round(Number(recipe.starRating) || 0)));
   const href = `/recipes/${recipe._id}`;

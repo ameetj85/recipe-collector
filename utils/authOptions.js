@@ -1,6 +1,5 @@
 import GoogleProvider from 'next-auth/providers/google';
-import connectDB from '@/config/database';
-import User from '@/models/User';
+import * as users from '@/models/users';
 
 export const authOptions = {
   providers: [
@@ -19,32 +18,22 @@ export const authOptions = {
   callbacks: {
     // invoked on successful sign-in
     async signIn({ profile }) {
-      // 1. connect to mongo db
-      await connectDB();
-      // 2. Check if user exists
-      const userExists = await User.findOne({ email: profile.email });
-      // 3. If not exists then add to db
-      if (!userExists) {
-        // trunc user name if too long
-        const username = profile.name.slice(0, 20);
-        await User.create({
-          email: profile.email,
-          username,
-          image: profile.picture,
-        });
-      }
-      // 4. Return true to allow sign in
+      // Create the user on first sign-in (no-op if the email already exists).
+      // The username is truncated if too long.
+      users.createIfMissing({
+        email: profile.email,
+        username: (profile.name || profile.email).slice(0, 20),
+        image: profile.picture,
+      });
       return true;
     },
     // Modifies the session object
     async session({ session }) {
-      // 1. get user from mongo (ensure a connection on fresh/serverless
-      //    instances, otherwise the query buffers ~10s and then fails)
-      await connectDB();
-      const user = await User.findOne({ email: session.user.email });
-      // 2. assign user id to the session (guard against a missing user doc)
+      // Expose the database id as session.user.id (client and server code
+      // depend on it). Guard against a missing user row.
+      const user = users.findByEmail(session.user.email);
       if (user) {
-        session.user.id = user._id.toString();
+        session.user.id = user.id;
       }
       // 3. return the session
       return session;

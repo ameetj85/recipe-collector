@@ -9,3 +9,12 @@ services:
       - "${APP_PORT:-9000}:9000"
     env_file:
       - ./.env
+    environment:
+      # Overrides any SQLITE_PATH in .env (which points at ./data for local dev).
+      SQLITE_PATH: /app/data/recipes.db
+    volumes:
+      # SQLite database + backups. Must persist across container rebuilds.
+      - recipe-data:/app/data
+
+volumes:
+  recipe-data:
