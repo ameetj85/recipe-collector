@@ -24,7 +24,7 @@ The app is one **Next.js 16 (App Router)** project. Server Components read the d
 | Image storage | BLOBs in the same SQLite file, resized with `sharp`; seed images stay in `public/images/recipes` |
 | Authentication | NextAuth v4 with the Google OAuth provider |
 | UI libraries | react-icons, react-toastify, react-spinners, react-share, react-tooltip |
-| Deployment | Docker (standalone Next.js output) on a VPS via GHCR, with the DB on a volume. **Vercel isn't supported**: it has no writable, persistent filesystem. |
+| Deployment | Plain Node on a VPS under systemd (`npm start`, port 9000) behind a TLS reverse proxy; see `DEPLOY.md`. **No Docker.** **Vercel isn't supported**: it has no writable, persistent filesystem. |
 
 ---
 
@@ -86,7 +86,7 @@ recipe-collector/
 │   ├── parseIngredients.js, getSessionUser.js, authOptions.js
 ├── data/                        # **git-ignored: recipes.db, backups/, migration reports**
 ├── docs/SQLITE_MIGRATION.md     # migration plan and runbook
-└── Dockerfile, docker-compose.yml, ReadMe.Docker.txt
+└── DEPLOY.md                    # **VPS deployment (systemd), backups, restore**
 ```
 
 ---
@@ -132,7 +132,7 @@ messages: sender_id → users, recipient_id → users, recipe_id → recipes
 `models/messages.listForRecipient()` returns `sender: { _id, username }` and `property: { _id, name }`. The `property` key name is kept for `components/Message.jsx`.
 
 ### Data access rules
-- `getDb()` is called lazily, inside functions, never at module load, so `next build` never opens the database. The handle is cached on `globalThis.__recipeDb` to survive hot reload. The DB path uses a `turbopackIgnore` hint so the build doesn't trace `data/` into the standalone output.
+- `getDb()` is called lazily, inside functions, never at module load, so `next build` never opens the database. The handle is cached on `globalThis.__recipeDb` to survive hot reload. The DB path uses a `turbopackIgnore` hint so the build's file tracing doesn't walk `data/`.
 - better-sqlite3 is **synchronous**, and its transactions can't contain `await`. Any async work (reading uploaded files, `sharp`) happens **before** the `db.transaction(...)` call.
 - List queries read `recipe_images` without the `data` column. BLOBs are only read by `/api/images/[id]`.
 - Search escapes `%`, `_` and `\` in user input and uses `LIKE … ESCAPE '\'`. SQLite `LIKE` is case-insensitive for ASCII. Ingredients are searched with `json_each`.
@@ -193,14 +193,13 @@ Unchanged apart from storage. `signIn` calls `users.createIfMissing()` (`INSERT 
 
 | Variable | Used by |
 |---|---|
-| `SQLITE_PATH` | `config/database.js` and scripts. Default `./data/recipes.db`, set to `/app/data/recipes.db` in Docker |
+| `SQLITE_PATH` | `config/database.js` and scripts. Default `./data/recipes.db`. On the server, `/var/lib/recipe-collector/recipes.db` |
 | `GOOGLE_CLIENT_ID`, `GOOGLE_CLIENT_SECRET` | NextAuth Google provider |
 | `NEXTAUTH_URL`, `NEXTAUTH_URL_INTERNAL`, `NEXTAUTH_SECRET` | NextAuth |
 | `NEXT_PUBLIC_DOMAIN` | Absolute URLs (share links) |
-| `APP_PORT` | docker-compose host port |
 | `MONGODB_URI` | **Only** for `db:migrate` / `db:verify` while the old cluster still exists |
 
-`next.config.mjs`: `output: "standalone"`, `serverExternalPackages: ["better-sqlite3"]`, `images.remotePatterns` (Google avatars; `res.cloudinary.com` stays until decommission), `images.deviceSizes` / `minimumCacheTTL` (§5), and `serverActions.bodySizeLimit: "10mb"`.
+`next.config.mjs`: `serverExternalPackages: ["better-sqlite3"]`, `images.remotePatterns` (Google avatars; `res.cloudinary.com` stays until decommission), `images.deviceSizes` / `minimumCacheTTL` (§5), and `serverActions.bodySizeLimit: "10mb"`.
 
 ---
 
@@ -214,20 +213,15 @@ npm run db:backup    # online backup to data/backups (keeps 14)
 ```
 Node ≥ 22 is required (better-sqlite3 13).
 
-**Docker:** the multi-stage `node:22-alpine` image needs no compiler, because better-sqlite3 ships a `linuxmusl` prebuild. The runner stage copies the standalone output, the `better-sqlite3` package and `scripts/backup-db.mjs`, creates `/app/data` owned by the `nextjs` user, and declares `VOLUME /app/data`. **Always run with a volume:**
+**Production (VPS, no Docker):** the code lives in `/opt/recipe-collector` and is built on the server (`npm ci && npm run build`). A systemd unit runs `npm start` (port 9000) as an unprivileged `recipe` user, behind a TLS reverse proxy. The database lives at `SQLITE_PATH=/var/lib/recipe-collector/recipes.db`, outside the code folder, so `git pull` deploys never touch it. Full steps are in `DEPLOY.md`.
 
-```bash
-docker run --env-file .env -p 9000:9000 -v recipe-data:/app/data ghcr.io/ameetj85/recipe-collector
-# or: docker compose up -d   (named volume recipe-data)
-```
-
-**Backups:** `node scripts/backup-db.mjs` uses SQLite's online backup API, which is safe while the app is writing. It writes a self-contained file, runs `integrity_check` on it, and prunes old copies. Run it nightly via cron (`docker exec <container> node scripts/backup-db.mjs --dir /app/data/backups`) and copy the backups off the server. To restore, stop the container, replace `recipes.db` (and delete any `-wal`/`-shm` files), then start it. See `ReadMe.Docker.txt`.
+**Backups:** `npm run db:backup` (`scripts/backup-db.mjs`) uses SQLite's online backup API, which is safe while the app is writing. It writes a self-contained file, runs `integrity_check` on it, and prunes old copies. Run it nightly from cron (`--dir /var/backups/recipe-collector`) and copy the backups off the server. To restore, stop the service, replace `recipes.db` (and delete any `-wal`/`-shm` files), then start it.
 
 **Migration tooling** (one-off, see `docs/SQLITE_MIGRATION.md`):
 - `npm run db:migrate -- [--out] [--force] [--dry-run] [--skip-broken-images]` reads Mongo, downloads and processes the Cloudinary images, and writes `<out>.tmp` in one transaction with FK and integrity checks. It renames the file into place only on success and writes `data/migration-report-*.json`.
 - `npm run db:verify` compares every row, field, image order and size, bookmark and message against Mongo, then runs the integrity checks. It exits non-zero on any mismatch.
 
-**Concurrency:** one Node process holds one connection. WAL lets reads run alongside a write, and `busy_timeout` covers the backup process. Don't run more than one app container against the same file.
+**Concurrency:** one Node process holds one connection. WAL lets reads run alongside a write, and `busy_timeout` covers the backup process. Don't run more than one app process against the same file (no PM2 cluster mode).
 
 ---
 
@@ -235,7 +229,7 @@ docker run --env-file .env -p 9000:9000 -v recipe-data:/app/data ghcr.io/ameetj8
 
 - **Decommission** (plan §6 step 11, after about 30 days): remove `mongodb` from devDependencies, the migration and verify scripts' npm entries, and the `res.cloudinary.com` remote pattern. Delete the Cloudinary folder and the Mongo cluster.
 - `recipes.json` and `recipes-import.json` are Mongo-shaped seed files. There's no SQLite seed script yet.
-- `bun.lock` is stale (it still lists mongoose and cloudinary). The Dockerfile uses `package-lock.json`.
+- `bun.lock` is stale (it still lists mongoose and cloudinary). Deploys use `package-lock.json` (`npm ci`).
 - There's no automated test suite. `npm run lint` reports 2 errors that predate the migration (`HomeRecipes` impure render, `RecipeAddForm` setState in an effect).
-- `ReadMe.Docker.txt` still contains a committed GitHub token. Revoke it.
+- A GitHub token committed in the old `ReadMe.Docker.txt` (now deleted) is still in git history. Revoke it.
 - `/api/images/:id` responses are sent chunked: Next's response adapter drops the `Content-Length` header.

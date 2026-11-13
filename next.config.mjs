@@ -1,9 +1,6 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-  output: "standalone",
-
-  // Native module: load it from node_modules at runtime instead of bundling
-  // it (also makes output tracing copy it into .next/standalone).
+  // Native module: load it from node_modules at runtime instead of bundling it.
   serverExternalPackages: ["better-sqlite3"],
 
   images: {

@@ -1,7 +1,7 @@
 // SQLite schema, version 1 (see docs/SQLITE_MIGRATION.md §2).
 //
 // Kept as a JS module rather than a .sql file so the app (bundled by Next,
-// traced into the standalone output) and the plain-Node scripts in scripts/
+// at build time) and the plain-Node scripts in scripts/
 // can both import it without any file-tracing configuration.
 
 export const SCHEMA_VERSION = 1;

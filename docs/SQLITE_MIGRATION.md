@@ -4,10 +4,11 @@
 >
 > **Deviations from the plan as written** (the plan predates the Server Actions refactor and the Next 16 upgrade):
 > - §3.3: there are no `app/api/recipes|bookmarks|messages` routes any more. The same changes went into `utils/queries.js` (reads) and `app/actions/*` (writes). The only new route is `app/api/images/[id]`.
-> - §2/§3.2: the schema lives in `db/schema.mjs` (a JS string) instead of `db/schema.sql`, so Next's standalone tracing and the plain-Node scripts can both import it without `fs` path tricks.
+> - §2/§3.2: the schema lives in `db/schema.mjs` (a JS string) instead of `db/schema.sql`, so Next's build and the plain-Node scripts can both import it without `fs` path tricks.
 > - §3.2 image policy: the cap is **2400 px wide × 3200 px tall** (not 1600 px), WebP q82. The full-bleed header is 100vw wide, and 1600 px looked soft on 1920 px and retina screens. Images already within limits, without EXIF, and smaller than their WebP version are kept byte-for-byte. Components now pass accurate `sizes` to `next/image` (the header switched from `<img>` to `next/image`), and 2400 was added to `images.deviceSizes`.
 > - §3.5: Next 16 uses `serverExternalPackages` (not `experimental.serverComponentsExternalPackages`). better-sqlite3 13 ships prebuilt binaries (including `linuxmusl-x64`), so the Dockerfile needs no python/make/g++. It requires Node ≥ 22.
 > - §3.5 Vercel: not applicable, because the app is no longer deployed there.
+> - **Docker removed entirely** (decided after the build phase). The project uses no Docker for any purpose: the Dockerfiles, `docker-compose.yml`, `.dockerignore` and `ReadMe.Docker.txt` were deleted, and `output: "standalone"` was dropped. Production runs as plain Node under systemd on the VPS (see `DEPLOY.md`). The Docker items in §3.5–§3.6 below are superseded, and the cutover steps (§6 steps 7–10), rollback and checklist were rewritten for the plain-Node deployment.
 > - §4 Phase D: the migrated file is left in `journal_mode=DELETE` (one self-contained file). The app switches it to WAL when it opens it.
 
 ## 1. Context
@@ -18,14 +19,14 @@ The app keeps its data in MongoDB (via Mongoose) and recipe images in Cloudinary
 
 | Decision | Choice |
 |---|---|
-| Hosting | **VPS only (Docker).** Vercel is retired, because a SQLite file can't be written to or kept on Vercel's filesystem. |
+| Hosting | **VPS only, plain Node under systemd (no Docker).** Vercel is retired, because a SQLite file can't be written to or kept on Vercel's filesystem. |
 | Driver | `better-sqlite3`: synchronous, fast, and widely used with Next.js on Node. |
 | Images | Stored as BLOBs in SQLite and **resized with `sharp`** (already a dependency) to at most 1600px on the longest side, as WebP at quality 80. This applies to new uploads and to migrated Cloudinary images. |
 | Seed images | Stay as files in `public/images/recipes/`. The DB stores only a reference to the file name. |
 | IDs | Existing Mongo ObjectId hex strings are kept as TEXT primary keys, so `/recipes/<id>` URLs and shared links keep working. New IDs use the same 24-hex format. |
 | API contract | **The JSON shapes don't change** (`_id`, `owner`, nested `nutritionInfo`, `images[]`, populated `sender`/`property` on messages, `createdAt`). The changes stay on the server side, plus one small image-src helper in the components. |
 
-**Results:** no Mongo, Cloudinary or Mongoose dependencies at runtime; one `recipes.db` file on a Docker volume; existing links still work; and a migration that can be repeated, verified, and rolled back while the old systems are kept.
+**Results:** no Mongo, Cloudinary or Mongoose dependencies at runtime; one `recipes.db` file on the server's disk; existing links still work; and a migration that can be repeated, verified, and rolled back while the old systems are kept.
 
 ---
 
@@ -217,21 +218,17 @@ Replace the inline `includes('http')` / `includes('https')` checks with `imageSr
 Without this change, `/api/images/<id>` would be turned into `/images/recipes//api/images/<id>`. `next/image` works with a relative `/api/images/...` src without any config.
 
 ### 3.5 Config and deployment
-- **`next.config.mjs`**: add `experimental: { serverComponentsExternalPackages: ['better-sqlite3'] }` (Next 14.1) so the native module isn't bundled and gets traced into the standalone output. Remove the `res.cloudinary.com` remote pattern **after** cutover is verified. Keep `lh3.googleusercontent.com`.
+- **`next.config.mjs`**: add `experimental: { serverComponentsExternalPackages: ['better-sqlite3'] }` (Next 14.1) so the native module isn't bundled. Remove the `res.cloudinary.com` remote pattern **after** cutover is verified. Keep `lh3.googleusercontent.com`.
 - **`.env.example`**: remove `MONGODB_URI` and `CLOUDINARY_*`, and add `SQLITE_PATH="./data/recipes.db"`. (`MONGODB_URI` is needed only in the local `.env` while the migration runs.)
-- **`.gitignore` / `.dockerignore`**: add `data/` and `*.db*`.
-- **`Dockerfile`**:
-  - `FROM node:22-alpine`.
-  - In the `deps` stage: `apk add --no-cache libc6-compat python3 make g++`. This is a fallback in case no prebuilt better-sqlite3 binary exists for musl.
-  - In `runner`: `RUN mkdir -p /app/data && chown nextjs:nodejs /app/data`, `ENV SQLITE_PATH=/app/data/recipes.db`, `VOLUME /app/data`.
-  - Run with `docker run -v recipe-data:/app/data …`.
+- **`.gitignore`**: add `data/` and `*.db*`.
+- **Server**: *(superseded: originally a Docker image with a volume; Docker has since been removed)*. Run with plain Node under systemd, `SQLITE_PATH=/var/lib/recipe-collector/recipes.db` (see `DEPLOY.md`).
 - **Backups**: `scripts/backup-db.mjs` uses better-sqlite3's online `db.backup('<dir>/recipes-<ts>.db')` (safe under WAL). Schedule it with cron on the VPS (e.g. nightly, keep 14 copies) and copy the backups off the box.
 - **Vercel**: remove the project or its domain after cutover. If the public domain currently points at Vercel, move DNS to the VPS and update `NEXTAUTH_URL`, `NEXT_PUBLIC_DOMAIN`, `NEXT_PUBLIC_API_DOMAIN`, **and the Google OAuth authorized redirect URI** (`https://<domain>/api/auth/callback/google`).
 
 ### 3.6 Documentation
 - `CLAUDE.md`: rewrite the Architecture sections for the route handler pattern (`getDb()`, no `connectDB`), images (DB BLOBs + seed files, `imageSrc()`), cascades (FK-based), and hosting (VPS only). Remove the Cloudinary and Mongoose gotchas, and add `SQLITE_PATH` plus the backup command.
 - `ARCHITECTURE.md`: replace the data model with §2, and add the `/api/images/:id` row to the API table.
-- `ReadMe.Docker.txt`: add volume mount and backup notes. **Don't copy the committed GitHub token anywhere.**
+- Deployment notes: *(superseded: `ReadMe.Docker.txt` was deleted along with Docker)*. Deploy and backup steps are in `DEPLOY.md`. **The GitHub token once committed in `ReadMe.Docker.txt` is still in git history: don't copy it anywhere, and revoke it.**
 
 ---
 
@@ -284,33 +281,33 @@ Run it against Mongo and the new DB. It exits non-zero on any mismatch.
 1. ✅ Create branch `sqlite-migration`. This doc is already at `docs/SQLITE_MIGRATION.md`.
 2. ✅ Add the dependencies and the data layer (§3.1, §3.2).
 3. ✅ Rewrite the route handlers and auth (§3.3), and update the components (§3.4). *(Applied to `utils/queries.js` and `app/actions/*`; see Deviations.)*
-4. ✅ Update config, the Dockerfile and the docs (§3.5, §3.6). *(`ARCHITECTURE.md` left unchanged by request; `ARCHITECTURE-SQLITE.md` is the new doc.)*
+4. ✅ Update config and the docs (§3.5, §3.6). *(Docker was later removed entirely; see Deviations.)* *(`ARCHITECTURE.md` left unchanged by request; `ARCHITECTURE-SQLITE.md` is the new doc.)*
 5. ✅ Write the migration and verify scripts (§4, §5).
-6. ◐ **Rehearsal:** `npm run db:migrate -- --dry-run`, then a real run into `./data/recipes.db`, then `npm run db:verify`. Run the dev server against that file and go through the checklist in §7. Build the Docker image locally and run it with the volume.
+6. ◐ **Rehearsal:** `npm run db:migrate -- --dry-run`, then a real run into `./data/recipes.db`, then `npm run db:verify`. Run the dev server against that file and go through the checklist in §7. 
    - ✅ Dry run, real run (3 users, 11 recipes, 26 image slots (9 Cloudinary → 2.07 MB to 0.72 MB, 17 seed), 3 bookmarks, 2 messages, 0 skipped) and `db:verify` passed.
    - ✅ Model-level checks on a copy of the DB: create/update/replace images, size caps (4000×3000 → 2400×1800), search with `% _ ( \`, bookmarks, messages, read toggle, cascade delete, `createIfMissing`.
    - ✅ `npm run build` and `next start` smoke test: all pages 200, `/api/images/:id` 200 with the immutable cache header, ETag 304, unknown id 404, the optimizer serves resized variants, and better-sqlite3 is traced into standalone.
    - ⬜ Signed-in browser flows from §7 (add/edit with photos, bookmark, messages, delete).
-   - ⬜ Docker image build and run with the volume (Docker wasn't available on the dev machine).
+   - ~~Docker image build~~: not applicable, Docker was removed.
 
 **Cutover (production VPS)**
 
-7. Announce a short maintenance window. **Stop the current production container** (and pause the Vercel deployment) so no new Mongo writes happen.
+7. Announce a short maintenance window. **Stop the current production app on the VPS** (the old Mongo-backed version) so no new Mongo writes happen.
 8. Back up the source data: `mongodump --uri "$MONGODB_URI" --out backup-<date>`. Cloudinary stays untouched as its own backup.
-9. Run `npm run db:migrate -- --force` and then `npm run db:verify` against production Mongo. Copy `recipes.db` into the VPS volume (e.g. `scp`, then `docker run --rm -v recipe-data:/data -v $PWD:/src alpine cp /src/recipes.db /data/`, then `chown 1001:1001`).
-10. Push the new image to GHCR and start it with the volume and the new env vars. Run the smoke tests (§7) on the production URL. Move DNS and the OAuth redirect URI if needed (§3.5). Enable the backup cron.
+9. Run `npm run db:migrate -- --force` and then `npm run db:verify` against production Mongo. Copy `recipes.db` to `/var/lib/recipe-collector/recipes.db` on the VPS with `scp`, and `chown recipe:recipe` it (`DEPLOY.md` §2).
+10. On the VPS, follow `DEPLOY.md` §1 and §3: Node 22, the code in `/opt/recipe-collector`, the new `.env` (with `SQLITE_PATH`, and no Mongo or Cloudinary settings), `npm ci && npm run build`, and the systemd service. Run the smoke tests (§7) on the production URL. Move DNS and the OAuth redirect URI if needed (§3.5). Enable the backup cron (`DEPLOY.md` §5).
 
 **Decommission (after about 30 days with no problems)**
 
-11. Delete the Cloudinary `RecipeApp` folder and its credentials, shut down the Mongo cluster, remove `mongodb` from devDependencies, remove the `res.cloudinary.com` remote pattern, and delete the Vercel project.
+11. Delete the Cloudinary `RecipeApp` folder and its credentials, shut down the Mongo cluster, remove `mongodb` from devDependencies, remove the `res.cloudinary.com` remote pattern, and delete the Vercel project and the old GHCR container images.
 
-**Rollback** (any time before step 11): redeploy the previous GHCR image tag, which still points at Mongo and Cloudinary, and those are unchanged. Anything written to SQLite after cutover would be lost, so decide within the first day or two, or replay those few records by hand.
+**Rollback** (any time before step 11): in `/opt/recipe-collector`, `git checkout 887393f` (the last pre-SQLite commit), restore the old `.env` (`MONGODB_URI`, `CLOUDINARY_*`), then `npm ci && npm run build && systemctl restart recipe-collector`. Mongo and Cloudinary are unchanged. Anything written to SQLite after cutover would be lost, so decide within the first day or two, or replay those few records by hand.
 
 ---
 
 ## 7. Verification checklist (local rehearsal and production smoke test)
 
-- `npm run build` succeeds. `.next/standalone/node_modules/better-sqlite3/build/Release/better_sqlite3.node` exists.
+- `npm run build` succeeds.
 - `curl localhost:9000/api/recipes` returns the same count and the same `_id`s as Mongo, and images look like `/api/images/<id>` or seed file names.
 - `curl -I localhost:9000/api/images/<id>` returns 200, `image/webp`, and the immutable cache header.
 - An old shared link `/recipes/<mongoId>` renders with its images.
@@ -321,4 +318,4 @@ Run it against Mongo and the new DB. It exits non-zero on any mismatch.
 - Search with text, with the cuisine filter, and with special characters (`%`, `_`, `(`) doesn't crash.
 - Messages: send, mark read and unread (the unread badge updates), delete.
 - Delete a recipe: its bookmarks, messages and image rows are gone (cascade).
-- Restart the container: the data is still there (the volume works). Run `npm run db:backup` and check that it produces a DB that opens.
+- `systemctl restart recipe-collector`: the data is still there. Run `npm run db:backup` and check that it produces a DB that opens.

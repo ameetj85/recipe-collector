@@ -5,7 +5,7 @@
   "scripts": {
     "dev": "next dev -p 9000",
     "build": "next build",
-    "start": "next start",
+    "start": "next start -p 9000",
     "lint": "eslint .",
     "db:migrate": "node --env-file=.env scripts/migrate-mongo-to-sqlite.mjs",
     "db:verify": "node --env-file=.env scripts/verify-migration.mjs",
