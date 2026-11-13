@@ -1,8 +1,10 @@
 "use client";
 
-import React, { useState, useEffect, useActionState } from "react";
+import React, { useState, useEffect, useActionState, useTransition, useRef } from "react";
 import { toast } from "react-toastify";
 import { addRecipe } from "@/app/actions/recipes";
+import { importRecipeFromUrl } from "@/app/actions/import";
+import { toImportUrl, parseRecipePage } from "@/utils/recipeImport";
 import SubmitButton from "@/components/SubmitButton";
 
 const RecipeAddForm = () => {
@@ -136,6 +138,72 @@ const RecipeAddForm = () => {
     }));
   };
 
+  // "Import": scrape the Allrecipes page in the URL field (on the server) and
+  // fill in whatever recipe fields it provides. If Allrecipes blocks the
+  // server's request, the user can paste the page source instead; that is
+  // parsed right here in the browser with the same parser.
+  const [isImporting, startImport] = useTransition();
+  const [showPaste, setShowPaste] = useState(false);
+  const pasteRef = useRef(null); // uncontrolled: page source can be ~1 MB
+
+  const applyImport = ({ fields: imported, missing }) => {
+    setFields((prevFields) => ({
+      ...prevFields,
+      ...imported,
+      ingredients: imported.ingredients
+        ? imported.ingredients.join("\n")
+        : prevFields.ingredients,
+      nutritionInfo: {
+        ...prevFields.nutritionInfo,
+        ...imported.nutritionInfo,
+      },
+    }));
+
+    if (missing.length) {
+      toast.warn(`Imported, but the page had no ${missing.join(", ")}.`);
+    } else {
+      toast.success("Recipe imported. Review the fields before saving.");
+    }
+  };
+
+  const handleImport = () => {
+    if (!toImportUrl(fields.url)) {
+      toast.error("Import only works with www.allrecipes.com recipe URLs.");
+      return;
+    }
+
+    startImport(async () => {
+      const result = await importRecipeFromUrl(fields.url);
+      if (result.error) {
+        toast.error(result.error);
+        if (result.canPaste) setShowPaste(true);
+        return;
+      }
+      setShowPaste(false);
+      applyImport(result);
+    });
+  };
+
+  const handlePasteImport = () => {
+    const html = pasteRef.current?.value || "";
+    if (!html.trim()) {
+      toast.error("Paste the page source into the box first.");
+      return;
+    }
+
+    const result = parseRecipePage(html);
+    if (!result) {
+      toast.error(
+        "No recipe data found. Make sure you copied the whole page source (Ctrl+U, then Ctrl+A and Ctrl+C)."
+      );
+      return;
+    }
+
+    applyImport(result);
+    pasteRef.current.value = "";
+    setShowPaste(false);
+  };
+
   const handleIngredientsChange = (e) => {
     setFields((prevFields) => ({
       ...prevFields,
@@ -214,16 +282,97 @@ const RecipeAddForm = () => {
           <label className="form-label">
             URL / Website of original recipe information
           </label>
-          <input
-            type="text"
-            id="url"
-            name="url"
-            className="form-input mb-3"
-            placeholder="url to original recipe"
-            required
-            value={fields.url}
-            onChange={handleChange}
-          />
+          <div className="flex gap-3 mb-3">
+            <input
+              type="text"
+              id="url"
+              name="url"
+              className="form-input flex-1 min-w-0"
+              placeholder="url to original recipe"
+              required
+              value={fields.url}
+              onChange={handleChange}
+            />
+            <button
+              type="button"
+              className="btn-secondary shrink-0 px-5"
+              title="scrape the web page pointed to by the url"
+              onClick={handleImport}
+              disabled={isImporting || !fields.url.trim()}
+            >
+              {isImporting ? "Importing..." : "Import"}
+            </button>
+          </div>
+
+          {!showPaste && toImportUrl(fields.url) && (
+            <button
+              type="button"
+              className="text-sm font-medium text-purple-600 hover:text-purple-800 underline underline-offset-2"
+              onClick={() => setShowPaste(true)}
+            >
+              Or paste the page source instead
+            </button>
+          )}
+
+          {showPaste && (
+            <div className="rounded-xl bg-purple-50 p-4 ring-1 ring-purple-100">
+              <p className="text-sm font-semibold text-purple-900">
+                Import from the page source
+              </p>
+              <ol className="mt-2 mb-3 list-decimal pl-5 text-sm text-slate-600 space-y-0.5">
+                <li>
+                  Open the recipe in your browser
+                  {fields.url && (
+                    <>
+                      {" "}(
+                      <a
+                        href={toImportUrl(fields.url) || fields.url}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="text-purple-700 underline"
+                      >
+                        open it
+                      </a>
+                      )
+                    </>
+                  )}
+                  .
+                </li>
+                <li>
+                  Press <kbd>Ctrl</kbd>+<kbd>U</kbd> (Mac: <kbd>⌥</kbd><kbd>⌘</kbd><kbd>U</kbd>) to view the page source.
+                </li>
+                <li>
+                  Select all (<kbd>Ctrl</kbd>+<kbd>A</kbd>), copy, and paste it below.
+                </li>
+              </ol>
+              {/* No `name`: the pasted source is parsed here and never submitted. */}
+              <textarea
+                ref={pasteRef}
+                id="pageSource"
+                className="form-input font-mono text-xs"
+                rows="5"
+                placeholder="Paste the page source here"
+                spellCheck={false}
+                aria-label="Page source"
+              ></textarea>
+              <div className="mt-3 flex gap-3">
+                <button
+                  type="button"
+                  className="btn-primary px-5 text-sm"
+                  onClick={handlePasteImport}
+                >
+                  Import from pasted source
+                </button>
+                <button
+                  type="button"
+                  className="btn-secondary px-5 text-sm"
+                  onClick={() => setShowPaste(false)}
+                >
+                  Cancel
+                </button>
+              </div>
+            </div>
+          )}
         </div>
         <div className="form-group">
           <label
