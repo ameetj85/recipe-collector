@@ -66,7 +66,7 @@ const ProfilePage = () => {
       if (res.status === 200) {
         // Remove the recipeId from state
         const updatedRecipes = recipes.filter(
-          (recipeId) => recipeId._id !== recipeId
+          (recipe) => recipe._id !== recipeId
         );
 
         setRecipes(updatedRecipes);

@@ -1,7 +1,10 @@
 import connectDB from '@/config/database';
 import Recipe from '@/models/Recipe';
 import { getSessionUser } from '@/utils/getSessionUser';
-import cloudinary from '@/config/cloudinary';
+import { uploadImages } from '@/utils/cloudinaryImages';
+import { parseIngredients } from '@/utils/parseIngredients';
+
+const MAX_IMAGES = 2;
 
 // GET /api/recipes
 export const GET = async (req) => {
@@ -39,7 +42,8 @@ export const POST = async (req) => {
     // access all values from images
     const images = formData
       .getAll('images')
-      .filter((image) => image.name != '');
+      .filter((image) => image.name != '')
+      .slice(0, MAX_IMAGES); // the form limits to 2, enforce it server-side too
 
     // create recipe data object for db
     const recipeData = {
@@ -64,42 +68,20 @@ export const POST = async (req) => {
         protein: formData.get('nutritionInfo.protein'),
         sugars: formData.get('nutritionInfo.sugars'),
       },
-      ingredients: formData.get('ingredients').split('\r\n'),
+      ingredients: parseIngredients(formData.get('ingredients')),
       // upload images logic is below
     };
 
-    // upload image(s) to Cloudinary
-
-    const imageUploadPromises = [];
-
-    for (const image of images) {
-      const imageBuffer = await image.arrayBuffer();
-      const imageArray = Array.from(new Uint8Array(imageBuffer));
-      const imageData = Buffer.from(imageArray);
-
-      // convert the image data to base64
-      const imageBase64 = imageData.toString('base64');
-
-      // make request to upload to cloudinary
-      const result = await cloudinary.uploader.upload(
-        `data:image/png;base64,${imageBase64}`,
-        { folder: 'RecipeApp' }
-      );
-
-      imageUploadPromises.push(result.secure_url);
-
-      // Wait for all images to upload
-      const uploadedImages = await Promise.all(imageUploadPromises);
-      // add uploaded images to the recipeData object
-      recipeData.images = uploadedImages;
-    }
+    // upload image(s) to Cloudinary in parallel
+    recipeData.images = await uploadImages(images);
 
     const newRecipe = new Recipe(recipeData);
     await newRecipe.save();
 
-    return Response.redirect(
-      `${process.env.NEXTAUTH_URL}/recipes/${newRecipe._id}`
-    );
+    // Redirect (303 so the browser follows with GET) to the new recipe.
+    // Fall back to the request's own origin if NEXTAUTH_URL is not set.
+    const baseUrl = process.env.NEXTAUTH_URL || new URL(req.url).origin;
+    return Response.redirect(`${baseUrl}/recipes/${newRecipe._id}`, 303);
 
     /*
     return new Response(JSON.stringify({ message: 'Success' }), {

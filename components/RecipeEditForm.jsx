@@ -36,6 +36,11 @@ const RecipeEditForm = () => {
   });
 
   const [loading, setLoading] = useState(true);
+  const [invalidImageCount, setInvalidImageCount] = useState(false);
+
+  const handleImageChange = (e) => {
+    setInvalidImageCount(e.target.files.length > 2);
+  };
 
   const handleIngredientsChange = (e) => {
     setFields((prevFields) => ({
@@ -98,7 +103,16 @@ const RecipeEditForm = () => {
     const fetchRecipeData = async () => {
       try {
         const recipeData = await fetchRecipe(id);
-        setFields(recipeData);
+        if (!recipeData) return;
+
+        // ingredients are stored as an array; the textarea needs one per line
+        // (otherwise React joins the array with commas and saving merges them)
+        setFields({
+          ...recipeData,
+          ingredients: Array.isArray(recipeData.ingredients)
+            ? recipeData.ingredients.map((i) => i.trim()).join("\n")
+            : recipeData.ingredients || "",
+        });
       } catch (error) {
         console.error(error);
       } finally {
@@ -112,7 +126,7 @@ const RecipeEditForm = () => {
   return (
     mounted && (
       <form onSubmit={handleSubmit}>
-        <h2 className="text-3xl text-center font-semibold mb-6">Add Recipe</h2>
+        <h2 className="text-3xl text-center font-semibold mb-6">Edit Recipe</h2>
 
         <div className="mb-4">
           <label htmlFor="type" className="block text-gray-700 font-bold mb-2">
@@ -409,6 +423,33 @@ const RecipeEditForm = () => {
               onChange={handleChange}
             ></textarea>
           </div>
+        </div>
+
+        <div className="mb-4 bg-white p-4">
+          <label
+            htmlFor="images"
+            className="block text-gray-700 font-bold mb-2"
+          >
+            Replace Images (optional, up to 2)
+          </label>
+          <p className="text-sm text-gray-500 mb-2">
+            Leave empty to keep the current images. Selecting new images
+            replaces all existing ones.
+          </p>
+          <input
+            type="file"
+            id="images"
+            name="images"
+            className="border rounded w-full py-2 px-3"
+            accept="image/*"
+            multiple
+            onChange={handleImageChange}
+          />
+          {invalidImageCount && (
+            <p className="text-red-500">
+              Only the first 2 selected images will be used.
+            </p>
+          )}
         </div>
 
         <div>

@@ -38,10 +38,14 @@ export const authOptions = {
     },
     // Modifies the session object
     async session({ session }) {
-      // 1. get user  from mongo
+      // 1. get user from mongo (ensure a connection on fresh/serverless
+      //    instances, otherwise the query buffers ~10s and then fails)
+      await connectDB();
       const user = await User.findOne({ email: session.user.email });
-      // 2. assign user id to the session
-      session.user.id = user._id.toString();
+      // 2. assign user id to the session (guard against a missing user doc)
+      if (user) {
+        session.user.id = user._id.toString();
+      }
       // 3. return the session
       return session;
     },

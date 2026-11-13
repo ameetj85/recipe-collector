@@ -13,7 +13,7 @@ const RecipeSearchForm = () => {
     e.preventDefault();
 
     if (searchCriteria === '' && recipeType === 'All') {
-      router.push('/recipe');
+      router.push('/recipes');
     } else {
       const query = `?searchCriteria=${searchCriteria}&recipeType=${recipeType}`;
 
