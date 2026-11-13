@@ -35,13 +35,18 @@ const SavedRecipesPage = () => {
   return loading ? (
     <Spinner loading={loading} />
   ) : (
-    <section className='px-4 py-6'>
-      <h1 className='text-2xl mb-4'>Saved Recipes</h1>
-      <div className='container-xl lg:container m-auto px-4 py-6'>
+    <section className='page-bg min-h-[60vh] px-4 py-12'>
+      <div className='container-xl lg:container m-auto px-4'>
+        <h1 className='font-display text-4xl font-bold gradient-text mb-2'>
+          Saved Recipes
+        </h1>
+        <p className='text-slate-500 mb-8'>Your bookmarked favourites.</p>
         {recipes.length === 0 ? (
-          <p>No recipes found</p>
+          <div className='panel p-10 text-center text-purple-700'>
+            You haven&apos;t saved any recipes yet.
+          </div>
         ) : (
-          <div className='grid grid-cols-1 md:grid-cols-3 gap-6'>
+          <div className='grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8'>
             {recipes.map((recipe) => (
               <RecipeCard key={recipe._id} recipe={recipe} />
             ))}

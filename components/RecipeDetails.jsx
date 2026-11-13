@@ -1,140 +1,168 @@
 import React from 'react';
-import { div, FaBreadSlice, FaCorn } from 'react-icons/fa';
-import { FaCopy, FaPrint } from 'react-icons/fa';
-// import Tooltip from '@/components/Tooltip';
-import { Tooltip } from 'react-tooltip';
+import {
+  FaCopy,
+  FaPrint,
+  FaStar,
+  FaClock,
+  FaFire,
+  FaExternalLinkAlt,
+  FaUtensils,
+} from 'react-icons/fa';
+import { toast } from 'react-toastify';
 import '@/components/RecipeDetails.css';
 
 const RecipeDetails = ({ recipe }) => {
-  let directions = recipe.directions.split('\n');
+  const directions = recipe.directions.split('\n').filter((d) => d.trim());
+  const rating = Math.max(
+    0,
+    Math.min(5, Math.round(Number(recipe.starRating) || 0))
+  );
 
   const handleCopyIngredients = () => {
-    let ingredients = '';
-
-    recipe.ingredients.map((i) => (ingredients = ingredients + i + '\r\n'));
-
-    navigator.clipboard.writeText(`${ingredients}`);
-    window.confirm('Ingredients list copied to Clipboard.);');
+    const ingredients = recipe.ingredients.join('\r\n');
+    navigator.clipboard.writeText(ingredients);
+    toast.success('Ingredients copied to clipboard');
   };
+
+  const nutrition = [
+    ['Calories', recipe.nutritionInfo.calories],
+    ['Fat', recipe.nutritionInfo.fat],
+    ['Carbs', recipe.nutritionInfo.carbs],
+    ['Protein', recipe.nutritionInfo.protein],
+  ];
+
+  const times = [
+    ['Prep Time', recipe.prepTime],
+    ['Cook Time', recipe.cookTime],
+    ['Total Time', recipe.totalTime],
+  ];
 
   return (
     <main>
-      <div className='bg-white p-6 rounded-lg shadow-md text-center md:text-left'>
-        <div className='text-gray-500 mb-4'>
-          {recipe.type}
-          <span className='ml-6  bg-white px-4 py-2 rounded-lg text-blue-500 font-bold'>
-            {recipe.starRating} stars
+      <div className='panel p-6 md:p-8'>
+        <div className='flex flex-wrap items-center gap-3 mb-4'>
+          <span className='badge-purple'>
+            <FaUtensils /> {recipe.type}
+          </span>
+          <span className='badge bg-fuchsia-100 text-fuchsia-700'>
+            {recipe.category}
+          </span>
+          <span className='flex items-center gap-0.5 ml-1'>
+            {[...Array(5)].map((_, i) => (
+              <FaStar
+                key={i}
+                className={i < rating ? 'text-amber-400' : 'text-purple-100'}
+              />
+            ))}
+            <span className='ml-2 text-sm text-slate-500'>
+              {recipe.starRating} stars
+            </span>
           </span>
           <button
             title='Print this Recipe'
-            className='float-right  bg-blue-500 text-white px-2 py-1 mt-1 rounded-md'
+            className='btn-icon ml-auto'
             onClick={() => window.print()}
           >
             <FaPrint />
           </button>
         </div>
-        <h1 className='text-3xl font-bold mb-4 text-blue-800'>
-          <a target='_blank' href={recipe.url} rel='noopener noreferrer'>
-            {recipe.name}
-          </a>
+        <h1 className='font-display text-3xl md:text-4xl font-bold text-purple-950'>
+          {recipe.name}
         </h1>
-        <div className='text-gray-500 mb-4'>{recipe.category}</div>
+        {recipe.url && (
+          <a
+            target='_blank'
+            href={recipe.url}
+            rel='noopener noreferrer'
+            className='mt-3 inline-flex items-center gap-2 text-sm font-medium text-purple-600 hover:text-fuchsia-600'
+          >
+            View original recipe <FaExternalLinkAlt className='text-xs' />
+          </a>
+        )}
       </div>
 
-      <h3 className='mt-6 text-lg font-bold mb-2  bg-gray-800 text-white p-2'>
-        Description
-      </h3>
-      <div className='bg-white p-6 rounded-lg shadow-md text-center md:text-left'>
-        <div className='flex  gap-4 text-gray-500 mb-2'>
-          {recipe.description}
+      <h3 className='section-title'>Description</h3>
+      <div className='panel p-6 text-slate-600 leading-relaxed'>
+        {recipe.description}
+      </div>
+
+      <div className='grid grid-cols-1 lg:grid-cols-2 gap-6'>
+        <div>
+          <h3 className='section-title'>Nutrition Information</h3>
+          <div className='panel p-5 grid grid-cols-4 gap-3 text-center'>
+            {nutrition.map(([label, value]) => (
+              <div
+                key={label}
+                className='rounded-xl bg-gradient-to-br from-purple-50 to-fuchsia-50 py-3'
+              >
+                <FaFire className='mx-auto mb-1 text-fuchsia-400' />
+                <div className='text-lg font-bold text-purple-800'>{value}</div>
+                <div className='text-xs uppercase tracking-wide text-purple-400'>
+                  {label}
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+
+        <div>
+          <h3 className='section-title'>Preparation</h3>
+          <div className='panel p-5 grid grid-cols-3 gap-3 text-center'>
+            {times.map(([label, value]) => (
+              <div
+                key={label}
+                className='rounded-xl bg-gradient-to-br from-purple-50 to-fuchsia-50 py-3'
+              >
+                <FaClock className='mx-auto mb-1 text-purple-400' />
+                <div className='text-lg font-bold text-purple-800'>
+                  {value}
+                  <span className='text-xs font-medium text-purple-400'>
+                    {' '}
+                    min
+                  </span>
+                </div>
+                <div className='text-xs uppercase tracking-wide text-purple-400'>
+                  {label}
+                </div>
+              </div>
+            ))}
+          </div>
         </div>
       </div>
 
-      <h3 className='mt-6 text-lg font-bold mb-2  bg-gray-800 text-white p-2'>
-        Nutrition Information
-      </h3>
-
-      <div className='bg-white p-6 rounded-lg shadow-md text-center md:text-left'>
-        <div className='flex  gap-4 text-gray-500 mb-2'>
-          <p>
-            <FaBreadSlice className='inline mr-2' />{' '}
-            {recipe.nutritionInfo.calories}{' '}
-            <span className='md:hidden lg:inline'>Calories</span>
-          </p>
-          <p>
-            <FaBreadSlice className='inline mr-2' /> {recipe.nutritionInfo.fat}{' '}
-            <span className='md:hidden lg:inline'>Fat</span>
-          </p>
-          <p>
-            <FaBreadSlice className='inline mr-2' />
-            {recipe.nutritionInfo.carbs}{' '}
-            <span className='md:hidden lg:inline'>Carbs</span>
-          </p>
-          <p>
-            <FaBreadSlice className='inline mr-2' />
-            {recipe.nutritionInfo.protein}{' '}
-            <span className='md:hidden lg:inline'>Protein</span>
-          </p>
-        </div>
-      </div>
-
-      <h3 className='mt-6 text-lg font-bold mb-2  bg-gray-800 text-white p-2'>
-        Recipe Preparation Information
-      </h3>
-
-      <div className='bg-white p-6 rounded-lg shadow-md text-center md:text-left'>
-        <div className='flex  gap-4 text-gray-500 mb-2'>
-          <p>
-            <div className='inline mr-2' /> Prep Time:{' '}
-            <span className='md:hidden lg:inline'>
-              {recipe.prepTime} minutes
-            </span>
-          </p>
-          <p>
-            <div className='inline mr-2' /> Cook Time:{' '}
-            <span className='md:hidden lg:inline'>
-              {recipe.cookTime} minutes
-            </span>
-          </p>
-          <p>
-            <div className='inline mr-2' />
-            Total Time:{' '}
-            <span className='md:hidden lg:inline'>
-              {recipe.totalTime} minutes
-            </span>
-          </p>
-        </div>
-      </div>
-
-      <h3 className='text-lg font-bold my-6 bg-gray-800 text-white p-2'>
-        Ingredients
-      </h3>
-
-      <div className='bg-white  text-gray-500 rounded-lg shadow-md mb-2 pl-2'>
+      <div className='flex items-center justify-between'>
+        <h3 className='section-title'>Ingredients</h3>
         <button
           title='Copy Ingredients to Clipboard'
-          className='float-right  bg-blue-500 text-white px-2 py-1 mt-1 mr-2 rounded-md'
-          onClick={() => handleCopyIngredients()}
+          className='btn-icon mt-5'
+          onClick={handleCopyIngredients}
         >
           <FaCopy />
         </button>
-        <ul>
+      </div>
+      <div className='panel p-6'>
+        <ul className='grid grid-cols-1 sm:grid-cols-2 gap-x-6 gap-y-2'>
           {recipe.ingredients.map((i, index) => (
-            <li key={index}>&#x2022; {i}</li>
+            <li key={index} className='flex items-start gap-3 text-slate-700'>
+              <span className='mt-2 h-2 w-2 flex-shrink-0 rounded-full bg-gradient-to-br from-purple-500 to-fuchsia-500' />
+              {i}
+            </li>
           ))}
         </ul>
       </div>
-      <h3 className='mt-6 text-lg font-bold mb-2  bg-gray-800 text-white p-2'>
-        Directions
-      </h3>
-      <div className=''>
-        <div className='bg-white  text-gray-500 rounded-lg shadow-md mb-2 p-2 '>
-          <ul>
-            {directions.map((i, index) => (
-              <li key={index}>&#x2022; {i}</li>
-            ))}
-          </ul>
-        </div>
+
+      <h3 className='section-title'>Directions</h3>
+      <div className='panel p-6'>
+        <ol className='space-y-4'>
+          {directions.map((step, index) => (
+            <li key={index} className='flex gap-4'>
+              <span className='flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-full bg-gradient-to-br from-purple-600 to-fuchsia-600 text-sm font-bold text-white shadow-md shadow-purple-500/30'>
+                {index + 1}
+              </span>
+              <p className='pt-1 text-slate-700 leading-relaxed'>{step}</p>
+            </li>
+          ))}
+        </ol>
       </div>
     </main>
   );

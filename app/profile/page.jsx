@@ -82,43 +82,59 @@ const ProfilePage = () => {
   };
 
   return (
-    <section className='bg-blue-50'>
-      <div className='container m-auto py-24'>
-        <div className='bg-white px-6 py-8 mb-4 shadow-md rounded-md border m-4 md:m-0'>
-          <h1 className='text-3xl font-bold mb-4'>Your Profile</h1>
-          <div className='flex flex-col md:flex-row'>
-            <div className='md:w-1/4 mx-20 mt-10'>
-              <div className='mb-4'>
+    <section className='page-bg'>
+      <div className='container m-auto py-16'>
+        <div className='panel overflow-hidden mb-4 m-4 md:m-0'>
+          <div className='gradient-hero px-8 pt-10 pb-20'>
+            <h1 className='font-display text-4xl font-bold text-white'>
+              Your Profile
+            </h1>
+          </div>
+          <div className='flex flex-col md:flex-row gap-8 px-6 md:px-10 pb-10'>
+            <div className='md:w-1/4 text-center md:text-left'>
+              <div className='mb-6 -mt-16'>
                 <Image
-                  className='h-32 w-32 md:h-48 md:w-48 rounded-full mx-auto md:mx-0'
+                  className='h-32 w-32 md:h-44 md:w-44 rounded-full mx-auto md:mx-0 ring-4 ring-white shadow-xl shadow-purple-900/20'
                   src={profileImage || profileDefault}
                   width={200}
                   height={200}
                   alt='User'
                 />
               </div>
-              <h2 className='text-2xl mb-4'>
-                <span className='font-bold block'>Name: </span> {profileName}
+              <h2 className='text-xl mb-4 text-slate-700 break-words'>
+                <span className='block text-xs font-semibold uppercase tracking-wider text-purple-500'>
+                  Name
+                </span>
+                {profileName}
               </h2>
-              <h2 className='text-2xl'>
-                <span className='font-bold block'>Email: </span> {profileEmail}
+              <h2 className='text-xl text-slate-700 break-words'>
+                <span className='block text-xs font-semibold uppercase tracking-wider text-purple-500'>
+                  Email
+                </span>
+                {profileEmail}
               </h2>
             </div>
 
-            <div className='md:w-3/4 md:pl-4'>
-              <h2 className='text-xl font-semibold mb-4'>Your Listings</h2>
+            <div className='md:w-3/4 md:pt-6'>
+              <h2 className='section-title !mt-0'>Your Listings</h2>
               {!loading && recipes.length === 0 && (
-                <p>You have no recipe listings</p>
+                <p className='rounded-xl bg-purple-50 p-6 text-purple-700'>
+                  You have no recipe listings
+                </p>
               )}
+              <div className='grid grid-cols-1 lg:grid-cols-2 gap-6'>
 
               {loading ? (
                 <Spinner loading={loading} />
               ) : (
                 recipes.map((recipe) => (
-                  <div key={recipe._id} className='mb-10'>
+                  <div
+                    key={recipe._id}
+                    className='overflow-hidden rounded-2xl bg-white ring-1 ring-purple-100 shadow-md transition hover:shadow-xl hover:shadow-purple-700/10'
+                  >
                     <Link href={`/recipes/${recipe._id}`}>
                       <Image
-                        className='h-32 w-full rounded-md object-cover'
+                        className='h-40 w-full object-cover'
                         src={
                           recipe.images[0].includes('http')
                             ? recipe.images[0]
@@ -130,22 +146,24 @@ const ProfilePage = () => {
                         priority={true}
                       />
                     </Link>
-                    <div className='mt-2'>
-                      <p className='text-lg font-semibold'>{recipe.name}</p>
-                      <p className='text-gray-600'>
-                        Description: {recipe.description}
+                    <div className='px-5 pt-4'>
+                      <p className='font-display text-lg font-bold text-purple-950'>
+                        {recipe.name}
+                      </p>
+                      <p className='mt-1 text-sm text-slate-500 line-clamp-2'>
+                        {recipe.description}
                       </p>
                     </div>
-                    <div className='mt-2'>
+                    <div className='flex gap-3 px-5 py-4'>
                       <Link
                         href={`/recipes/${recipe._id}/edit`}
-                        className='bg-blue-500 text-white px-3 py-3 rounded-md mr-2 hover:bg-blue-600'
+                        className='btn-primary text-sm px-6'
                       >
                         Edit
                       </Link>
                       <button
                         onClick={() => handleDeleteRecipe(recipe._id)}
-                        className='bg-red-500 text-white px-3 py-2 rounded-md hover:bg-red-600'
+                        className='btn-danger text-sm px-6'
                         type='button'
                       >
                         Delete
@@ -154,6 +172,7 @@ const ProfilePage = () => {
                   </div>
                 ))
               )}
+              </div>
             </div>
           </div>
         </div>

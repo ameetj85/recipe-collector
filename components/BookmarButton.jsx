@@ -65,22 +65,24 @@ const BookmarkButton = ({ recipe }) => {
   };
 
   if (loading) {
-    return <p className='text-center'>... Loading</p>;
+    return (
+      <div className='h-12 w-full animate-pulse rounded-full bg-purple-100' />
+    );
   }
 
   return isBookmarked ? (
     <button
       onClick={onHandleClick}
-      className='bg-red-500 hover:bg-red-600 text-white font-bold w-full py-2 px-4 rounded-full flex items-center justify-center'
+      className='btn-secondary w-full py-3'
     >
-      <FaBookmark className='mr-2' /> Remove Bookmark
+      <FaBookmark /> Remove Bookmark
     </button>
   ) : (
     <button
       onClick={onHandleClick}
-      className='bg-blue-500 hover:bg-blue-600 text-white font-bold w-full py-2 px-4 rounded-full flex items-center justify-center'
+      className='btn-primary w-full py-3'
     >
-      <FaBookmark className='mr-2' /> Bookmark Recipe
+      <FaBookmark /> Bookmark Recipe
     </button>
   );
 };

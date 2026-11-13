@@ -126,16 +126,16 @@ const RecipeEditForm = () => {
   return (
     mounted && (
       <form onSubmit={handleSubmit}>
-        <h2 className="text-3xl text-center font-semibold mb-6">Edit Recipe</h2>
+        <h2 className="font-display text-4xl text-center font-bold gradient-text mb-10">Edit Recipe</h2>
 
-        <div className="mb-4">
-          <label htmlFor="type" className="block text-gray-700 font-bold mb-2">
+        <div className="form-group">
+          <label htmlFor="type" className="form-label">
             Recipe Type
           </label>
           <select
             id="type"
             name="type"
-            className="border rounded w-full py-2 px-3"
+            className="form-input"
             required
             value={fields.type}
             onChange={handleChange}
@@ -150,14 +150,14 @@ const RecipeEditForm = () => {
           </select>
         </div>
 
-        <div className="mb-4">
-          <label htmlFor="type" className="block text-gray-700 font-bold mb-2">
+        <div className="form-group">
+          <label htmlFor="type" className="form-label">
             Cusisine Category
           </label>
           <select
             id="category"
             name="category"
-            className="border rounded w-full py-2 px-3"
+            className="form-input"
             required
             value={fields.category}
             onChange={handleChange}
@@ -175,47 +175,47 @@ const RecipeEditForm = () => {
             <option value="Other">Other</option>
           </select>
         </div>
-        <div className="mb-4">
-          <label className="block text-gray-700 font-bold mb-2">
+        <div className="form-group">
+          <label className="form-label">
             Recipe Name
           </label>
           <input
             type="text"
             id="name"
             name="name"
-            className="border rounded w-full py-2 px-3 mb-2"
+            className="form-input mb-3"
             placeholder="eg. Delicious Chocolate Chip Cookies"
             required
             value={fields.name}
             onChange={handleChange}
           />
         </div>
-        <div className="mb-4">
-          <label className="block text-gray-700 font-bold mb-2">
+        <div className="form-group">
+          <label className="form-label">
             URL / Website of original recipe information
           </label>
           <input
             type="text"
             id="url"
             name="url"
-            className="border rounded w-full py-2 px-3 mb-2"
+            className="form-input mb-3"
             placeholder="url to original recipe"
             required
             value={fields.url}
             onChange={handleChange}
           />
         </div>
-        <div className="mb-4">
+        <div className="form-group">
           <label
             htmlFor="description"
-            className="block text-gray-700 font-bold mb-2"
+            className="form-label"
           >
             Description
           </label>
           <textarea
             id="description"
             name="description"
-            className="border rounded w-full py-2 px-3"
+            className="form-input"
             rows="4"
             placeholder="Add an optional description of your recipe"
             value={fields.description}
@@ -223,15 +223,15 @@ const RecipeEditForm = () => {
           ></textarea>
         </div>
 
-        <div className="mb-4">
-          <label className="block text-gray-700 font-bold mb-2">
+        <div className="form-group">
+          <label className="form-label">
             Star Rating
           </label>
           <input
             type="number"
             id="starRating"
             name="starRating"
-            className="border rounded w-full py-2 px-3 mb-2"
+            className="form-input mb-3"
             placeholder="Telkl us how much you loved this recipe. Between 1 and 5 stars."
             required
             value={fields.starRating}
@@ -239,13 +239,13 @@ const RecipeEditForm = () => {
           />
         </div>
 
-        <label className="block text-gray-700 font-bold mb-2">
+        <label className="form-label">
           Prep and Cook Times
         </label>
-        <div className="mb-4 bg-blue-50 p-4">
+        <div className="form-section">
           <label
             htmlFor="prepTime"
-            className="block text-gray-700 font-bold mb-2"
+            className="form-label"
           >
             Preparation Time (minutes)
           </label>
@@ -253,14 +253,14 @@ const RecipeEditForm = () => {
             type="number"
             id="prepTime"
             name="prepTime"
-            className="border rounded w-full py-2 px-3 mb-2"
+            className="form-input mb-3"
             placeholder="Preparation Time (in minutes)"
             value={fields.prepTime}
             onChange={handleChange}
           />
           <label
             htmlFor="cookTime"
-            className="block text-gray-700 font-bold mb-2"
+            className="form-label"
           >
             Cooking Time (minutes)
           </label>
@@ -268,14 +268,14 @@ const RecipeEditForm = () => {
             type="number"
             id="cookTime"
             name="cookTime"
-            className="border rounded w-full py-2 px-3 mb-2"
+            className="form-input mb-3"
             placeholder="Total Cook Time (in minutes)"
             value={fields.cookTime}
             onChange={handleChange}
           />
           <label
             htmlFor="totalTime"
-            className="block text-gray-700 font-bold mb-2"
+            className="form-label"
           >
             Total Time (minutes)
           </label>
@@ -283,14 +283,14 @@ const RecipeEditForm = () => {
             type="number"
             id="totalTime"
             name="totalTime"
-            className="border rounded w-full py-2 px-3 mb-2"
+            className="form-input mb-3"
             placeholder="Total Cook Time. Includes misc time. (in minutes)"
             value={fields.totalTime}
             onChange={handleChange}
           />
           <label
             htmlFor="servings"
-            className="block text-gray-700 font-bold mb-2"
+            className="form-label"
           >
             Number of Servings
           </label>
@@ -298,18 +298,19 @@ const RecipeEditForm = () => {
             type="number"
             id="servings"
             name="servings"
-            className="border rounded w-full py-2 px-3 mb-2"
+            className="form-input mb-3"
             placeholder="How many servings does this dish provie?"
             value={fields.servings}
             onChange={handleChange}
           />
         </div>
 
-        <div className="mb-4 flex flex-wrap">
-          <div className="w-full sm:w-1/3 pr-2">
+        <h3 className="form-heading">Nutrition Information</h3>
+        <div className="form-section grid grid-cols-2 sm:grid-cols-5 gap-4">
+          <div className="w-full">
             <label
               htmlFor="calories"
-              className="block text-gray-700 font-bold mb-2"
+              className="form-label"
             >
               Calories
             </label>
@@ -317,30 +318,30 @@ const RecipeEditForm = () => {
               type="number"
               id="calories"
               name="nutritionInfo.calories"
-              className="border rounded w-full py-2 px-3"
+              className="form-input"
               value={fields.nutritionInfo.calories}
               placeholder="Calories"
               onChange={handleChange}
             />
           </div>
-          <div className="w-full sm:w-1/3 px-2">
-            <label htmlFor="fat" className="block text-gray-700 font-bold mb-2">
+          <div className="w-full">
+            <label htmlFor="fat" className="form-label">
               Fat
             </label>
             <input
               type="number"
               id="fat"
               name="nutritionInfo.fat"
-              className="border rounded w-full py-2 px-3"
+              className="form-input"
               value={fields.nutritionInfo.fat}
               placeholder="Fat"
               onChange={handleChange}
             />
           </div>
-          <div className="w-full sm:w-1/3 pl-2">
+          <div className="w-full">
             <label
               htmlFor="carbs"
-              className="block text-gray-700 font-bold mb-2"
+              className="form-label"
             >
               Carbs
             </label>
@@ -348,16 +349,16 @@ const RecipeEditForm = () => {
               type="number"
               id="carbs"
               name="nutritionInfo.carbs"
-              className="border rounded w-full py-2 px-3"
+              className="form-input"
               value={fields.nutritionInfo.carbs}
               placeholder="Carbs"
               onChange={handleChange}
             />
           </div>
-          <div className="w-full sm:w-1/3 px-2">
+          <div className="w-full">
             <label
               htmlFor="protein"
-              className="block text-gray-700 font-bold mb-2"
+              className="form-label"
             >
               Protein
             </label>
@@ -365,16 +366,16 @@ const RecipeEditForm = () => {
               type="number"
               id="prrotein"
               name="nutritionInfo.protein"
-              className="border rounded w-full py-2 px-3"
+              className="form-input"
               value={fields.nutritionInfo.protein}
               onChange={handleChange}
               placeholder="Protein"
             />
           </div>
-          <div className="w-full sm:w-1/3 pl-2">
+          <div className="w-full">
             <label
               htmlFor="sugar"
-              className="block text-gray-700 font-bold mb-2"
+              className="form-label"
             >
               Sugars
             </label>
@@ -382,7 +383,7 @@ const RecipeEditForm = () => {
               type="number"
               id="sugar"
               name="nutritionInfo.sugars"
-              className="border rounded w-full py-2 px-3"
+              className="form-input"
               value={fields.nutritionInfo.sugars}
               onChange={handleChange}
               placeholder="Sugar"
@@ -390,15 +391,15 @@ const RecipeEditForm = () => {
           </div>
         </div>
 
-        <div className="mb-4">
-          <h3 className="text-lg font-bold my-6 bg-gray-800 text-white p-2">
+        <div className="form-group">
+          <h3 className="form-heading">
             Ingredients
           </h3>
-          <div className="ml-5 ">
+          <div className="">
             <textarea
               id="ingredients"
               name="ingredients"
-              className="border rounded w-full py-2 px-3"
+              className="form-input"
               rows="10"
               placeholder="Add ingredients, each one on a separate line"
               value={fields.ingredients}
@@ -407,15 +408,15 @@ const RecipeEditForm = () => {
           </div>
         </div>
 
-        <div className="mb-4">
-          <h3 className="text-lg font-bold my-6 bg-gray-800 text-white p-2">
+        <div className="form-group">
+          <h3 className="form-heading">
             Directions
           </h3>
-          <div className="ml-5 ">
+          <div className="">
             <textarea
               id="directions"
               name="directions"
-              className="border rounded w-full py-2 px-3"
+              className="form-input"
               rows="10"
               cols={50}
               placeholder="Add cooking directions, each one on a separate line"
@@ -425,14 +426,14 @@ const RecipeEditForm = () => {
           </div>
         </div>
 
-        <div className="mb-4 bg-white p-4">
+        <div className="form-group">
           <label
             htmlFor="images"
-            className="block text-gray-700 font-bold mb-2"
+            className="form-label"
           >
             Replace Images (optional, up to 2)
           </label>
-          <p className="text-sm text-gray-500 mb-2">
+          <p className="text-sm text-slate-500 mb-2">
             Leave empty to keep the current images. Selecting new images
             replaces all existing ones.
           </p>
@@ -440,13 +441,13 @@ const RecipeEditForm = () => {
             type="file"
             id="images"
             name="images"
-            className="border rounded w-full py-2 px-3"
+            className="form-input"
             accept="image/*"
             multiple
             onChange={handleImageChange}
           />
           {invalidImageCount && (
-            <p className="text-red-500">
+            <p className="mt-2 text-sm font-medium text-rose-600">
               Only the first 2 selected images will be used.
             </p>
           )}
@@ -454,7 +455,7 @@ const RecipeEditForm = () => {
 
         <div>
           <button
-            className="bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded-full w-full focus:outline-none focus:shadow-outline"
+            className="btn-primary w-full py-3.5 text-lg mt-4"
             type="submit"
           >
             Update Recipe

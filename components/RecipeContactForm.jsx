@@ -53,25 +53,29 @@ const RecipeContactForm = ({ recipe }) => {
   };
 
   return (
-    <div className='bg-white p-6 rounded-lg shadow-md'>
-      <h3 className='text-xl font-bold mb-6'>Contact Recipe Publisher</h3>
+    <div className='panel p-6'>
+      <h3 className='font-display text-xl font-bold text-purple-950 mb-6'>
+        Contact Recipe Publisher
+      </h3>
       {!session ? (
-        <p>You must be logged in to send a message</p>
+        <p className='rounded-xl bg-purple-50 p-4 text-sm text-purple-700'>
+          You must be logged in to send a message
+        </p>
       ) : wasSubmitted ? (
-        <p className='text-green-600 mb-4'>
+        <p className='rounded-xl bg-emerald-50 p-4 text-sm text-emerald-700'>
           Your message has been sent successfully
         </p>
       ) : (
         <form onSubmit={handleSubmit}>
           <div className='mb-4'>
             <label
-              className='block text-gray-700 text-sm font-bold mb-2'
+              className='form-label'
               htmlFor='name'
             >
               Name:
             </label>
             <input
-              className='shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline'
+              className='form-input'
               id='name'
               type='text'
               placeholder='Enter your name'
@@ -81,13 +85,13 @@ const RecipeContactForm = ({ recipe }) => {
           </div>
           <div className='mb-4'>
             <label
-              className='block text-gray-700 text-sm font-bold mb-2'
+              className='form-label'
               htmlFor='email'
             >
               Email:
             </label>
             <input
-              className='shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline'
+              className='form-input'
               id='email'
               type='email'
               placeholder='Enter your email'
@@ -98,13 +102,13 @@ const RecipeContactForm = ({ recipe }) => {
           </div>
           <div className='mb-4'>
             <label
-              className='block text-gray-700 text-sm font-bold mb-2'
+              className='form-label'
               htmlFor='phone'
             >
               Phone:
             </label>
             <input
-              className='shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline'
+              className='form-input'
               id='phone'
               type='text'
               placeholder='Enter your phone number'
@@ -114,13 +118,13 @@ const RecipeContactForm = ({ recipe }) => {
           </div>
           <div className='mb-4'>
             <label
-              className='block text-gray-700 text-sm font-bold mb-2'
+              className='form-label'
               htmlFor='message'
             >
               Message:
             </label>
             <textarea
-              className='shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 h-44 focus:outline-none focus:shadow-outline'
+              className='form-input h-40'
               id='message'
               placeholder='Enter your message'
               value={message}
@@ -129,10 +133,10 @@ const RecipeContactForm = ({ recipe }) => {
           </div>
           <div>
             <button
-              className='bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded-full w-full focus:outline-none focus:shadow-outline flex items-center justify-center'
+              className='btn-primary w-full py-3'
               type='submit'
             >
-              <FaPaperPlane className='mr-2' /> Send Message
+              <FaPaperPlane /> Send Message
             </button>
           </div>
         </form>

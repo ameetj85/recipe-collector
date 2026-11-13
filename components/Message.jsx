@@ -62,56 +62,63 @@ const Message = ({ message }) => {
   }
 
   return (
-    <div className='relative bg-white p-4 rounded-md shadow-md border border-gray-200'>
+    <div
+      className={`relative panel p-6 border-l-4 ${
+        isRead ? 'border-l-purple-200' : 'border-l-fuchsia-500'
+      }`}
+    >
       {!isRead && (
-        <div className='absolute top-2 right-2 bg-yellow-500 text-white px-2 py-1 rounded-md'>
+        <div className='absolute top-4 right-4 badge bg-gradient-to-r from-fuchsia-500 to-purple-600 text-white shadow'>
           New
         </div>
       )}
-      <h2 className='text-xl mb-4'>
-        <span className='font-bold'>Recipe Inquiry:</span>{' '}
+      <h2 className='text-xl mb-4 pr-16 text-purple-950'>
+        <span className='font-semibold text-purple-600'>Recipe Inquiry:</span>{' '}
         {message.property.name}
       </h2>
-      <p className='text-gray-700'>{message.body}</p>
+      <p className='text-slate-700 bg-purple-50/70 rounded-xl p-4'>
+        {message.body}
+      </p>
 
-      <ul className='mt-4'>
+      <ul className='mt-4 space-y-1 text-sm text-slate-600'>
         <li>
-          <strong>Name:</strong> {message.sender.username}
+          <strong className='text-purple-900'>Name:</strong>{' '}
+          {message.sender.username}
         </li>
 
         <li>
-          <strong>Reply Email:</strong>{' '}
+          <strong className='text-purple-900'>Reply Email:</strong>{' '}
           <a
             href={`mailto:${message.email}`}
             target='_blank'
-            className='text-blue-500'
+            className='text-purple-600 hover:text-fuchsia-600'
           >
             {message.email}
           </a>
         </li>
         <li>
-          <strong>Reply Phone:</strong>{' '}
-          <a href={`tel:${message.phone}`} className='text-blue-500'>
+          <strong className='text-purple-900'>Reply Phone:</strong>{' '}
+          <a
+            href={`tel:${message.phone}`}
+            className='text-purple-600 hover:text-fuchsia-600'
+          >
             {message.phone}
           </a>
         </li>
         <li>
-          <strong>Received:</strong>{' '}
+          <strong className='text-purple-900'>Received:</strong>{' '}
           {new Date(message.createdAt).toLocaleString()}
         </li>
       </ul>
       <button
         onClick={handleReadClick}
-        className={`mt-4 mr-3 ${
-          isRead ? 'bg-gray-300' : 'bg-blue-500 text-white'
-        } py-1 px-3 rounded-md`}
+        className={`mt-5 mr-3 text-sm ${
+          isRead ? 'btn-secondary' : 'btn-primary'
+        }`}
       >
         {isRead ? 'Mark As New' : 'Mark As Read'}
       </button>
-      <button
-        onClick={handleDeleteClick}
-        className='mt-4 bg-red-500 text-white py-1 px-3 rounded-md'
-      >
+      <button onClick={handleDeleteClick} className='mt-5 btn-danger text-sm'>
         Delete
       </button>
     </div>

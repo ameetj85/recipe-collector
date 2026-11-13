@@ -9,6 +9,18 @@ import { usePathname } from 'next/navigation';
 import UnreadMessageCount from './UnreadMessageCount';
 import { signIn, signOut, useSession } from 'next-auth/react';
 
+const navLinkClass = (active) =>
+  `${
+    active
+      ? 'bg-white/15 text-white shadow-inner ring-1 ring-white/20'
+      : 'text-purple-100 hover:bg-white/10 hover:text-white'
+  } rounded-full px-4 py-2 text-sm font-medium transition-colors`;
+
+const mobileLinkClass = (active) =>
+  `${
+    active ? 'bg-white/15 text-white' : 'text-purple-100 hover:bg-white/10'
+  } block rounded-xl px-4 py-2.5 text-base font-medium`;
+
 const Navbar = () => {
   // status: 'loading' | 'authenticated' | 'unauthenticated'
   const { data: session, status } = useSession();
@@ -20,7 +32,7 @@ const Navbar = () => {
   const pathname = usePathname();
 
   return (
-    <nav className='bg-blue-700 border-b border-blue-500'>
+    <nav className='sticky top-0 z-40 bg-gradient-to-r from-purple-950 via-purple-800 to-fuchsia-800 shadow-lg shadow-purple-950/20'>
       <div className='mx-auto max-w-7xl px-2 sm:px-6 lg:px-8'>
         <div className='relative flex h-20 items-center justify-between'>
           <div className='absolute inset-y-0 left-0 flex items-center md:hidden'>
@@ -28,9 +40,9 @@ const Navbar = () => {
             <button
               type='button'
               id='mobile-dropdown-button'
-              className='relative inline-flex items-center justify-center rounded-md p-2 text-gray-400 hover:bg-gray-700 hover:text-white focus:outline-none focus:ring-2 focus:ring-inset focus:ring-white'
+              className='relative inline-flex items-center justify-center rounded-full p-2 text-purple-200 hover:bg-white/10 hover:text-white focus:outline-none focus:ring-2 focus:ring-inset focus:ring-white'
               aria-controls='mobile-menu'
-              aria-expanded='false'
+              aria-expanded={isMobileMenuOpen}
               onClick={() => setIsMobileMenuOpen((prev) => !prev)}
             >
               <span className='absolute -inset-0.5'></span>
@@ -54,38 +66,34 @@ const Navbar = () => {
 
           <div className='flex flex-1 items-center justify-center md:items-stretch md:justify-start'>
             {/* <!-- Logo --> */}
-            <Link className='flex flex-shrink-0 items-center' href='/'>
-              <Image className='h-10 w-auto' src={logo} alt='RecipeApp' />
+            <Link className='flex flex-shrink-0 items-center group' href='/'>
+              <Image
+                className='h-11 w-11 rounded-full object-cover ring-2 ring-white/40 group-hover:ring-fuchsia-300 transition'
+                src={logo}
+                alt='RecipeApp'
+              />
 
-              <span className='hidden md:block text-white text-2xl font-bold ml-2'>
-                Recipe App
+              <span className='hidden md:block font-display text-2xl font-bold ml-3 text-white tracking-tight'>
+                Recipe
+                <span className='text-fuchsia-300'> App</span>
               </span>
             </Link>
             {/* <!-- Desktop Menu Hidden below md screens --> */}
-            <div className='hidden md:ml-6 md:block'>
-              <div className='flex space-x-2'>
-                <Link
-                  href='/'
-                  className={`${
-                    pathname === '/' ? 'bg-black' : ''
-                  } text-white hover:bg-gray-900 hover:text-white rounded-md px-3 py-2`}
-                >
+            <div className='hidden md:ml-8 md:flex md:items-center'>
+              <div className='flex space-x-1'>
+                <Link href='/' className={navLinkClass(pathname === '/')}>
                   Home
                 </Link>
                 <Link
                   href='/recipes'
-                  className={`${
-                    pathname === '/recipes' ? 'bg-black' : ''
-                  } text-white hover:bg-gray-900 hover:text-white rounded-md px-3 py-2`}
+                  className={navLinkClass(pathname === '/recipes')}
                 >
                   Recipes
                 </Link>
                 {session && (
                   <Link
                     href='/recipes/add'
-                    className={`${
-                      pathname === '/recipes/add' ? 'bg-black' : ''
-                    } text-white hover:bg-gray-900 hover:text-white rounded-md px-3 py-2`}
+                    className={navLinkClass(pathname === '/recipes/add')}
                   >
                     Add Recipe
                   </Link>
@@ -102,9 +110,9 @@ const Navbar = () => {
               <div className='flex items-center'>
                 <button
                   onClick={() => signIn('google')}
-                  className='flex items-center text-white bg-gray-700 hover:bg-gray-900 hover:text-white rounded-md px-3 py-2'
+                  className='btn bg-white text-purple-800 hover:bg-purple-50 shadow-md text-sm'
                 >
-                  <FaGoogle className='text-white mr-2' />
+                  <FaGoogle />
                   <span>Login or Register</span>
                 </button>
               </div>
@@ -117,7 +125,7 @@ const Navbar = () => {
               <Link href='/messages' className='relative group'>
                 <button
                   type='button'
-                  className='relative rounded-full bg-gray-800 p-1 text-gray-400 hover:text-white focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-gray-800'
+                  className='relative rounded-full bg-white/10 p-2 text-purple-100 hover:bg-white/20 hover:text-white transition focus:outline-none focus:ring-2 focus:ring-white'
                 >
                   <span className='absolute -inset-1.5'></span>
                   <span className='sr-only'>View notifications</span>
@@ -140,20 +148,20 @@ const Navbar = () => {
                 <UnreadMessageCount session={session} />
               </Link>
               {/* <!-- Profile dropdown button --> */}
-              <div className='relative ml-3'>
+              <div className='relative ml-4'>
                 <div>
                   <button
                     type='button'
-                    className='relative flex rounded-full bg-gray-800 text-sm focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-gray-800'
+                    className='relative flex rounded-full text-sm ring-2 ring-white/40 hover:ring-fuchsia-300 transition focus:outline-none focus:ring-fuchsia-300'
                     id='user-menu-button'
-                    aria-expanded='false'
+                    aria-expanded={isProfileMenuOpen}
                     aria-haspopup='true'
                     onClick={() => setIsProfileMenuOpen((prev) => !prev)}
                   >
                     <span className='absolute -inset-1.5'></span>
                     <span className='sr-only'>Open user menu</span>
                     <Image
-                      className='h-8 w-8 rounded-full'
+                      className='h-9 w-9 rounded-full'
                       src={profileImage || profileDefault}
                       alt=''
                       width={40}
@@ -166,7 +174,7 @@ const Navbar = () => {
                 {isProfileMenuOpen && (
                   <div
                     id='user-menu'
-                    className='absolute right-0 z-10 mt-2 w-48 origin-top-right rounded-md bg-white py-1 shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none'
+                    className='absolute right-0 z-50 mt-3 w-52 origin-top-right overflow-hidden rounded-2xl bg-white py-2 shadow-2xl shadow-purple-900/20 ring-1 ring-purple-100 focus:outline-none'
                     role='menu'
                     aria-orientation='vertical'
                     aria-labelledby='user-menu-button'
@@ -174,7 +182,7 @@ const Navbar = () => {
                   >
                     <Link
                       href='/profile'
-                      className='block px-4 py-2 text-sm text-gray-700'
+                      className='block px-4 py-2 text-sm text-slate-700 hover:bg-purple-50 hover:text-purple-800'
                       role='menuitem'
                       tabIndex='-1'
                       id='user-menu-item-0'
@@ -186,22 +194,23 @@ const Navbar = () => {
                     </Link>
                     <Link
                       href='/recipes/saved'
-                      className='block px-4 py-2 text-sm text-gray-700'
+                      className='block px-4 py-2 text-sm text-slate-700 hover:bg-purple-50 hover:text-purple-800'
                       role='menuitem'
                       tabIndex='-1'
-                      id='user-menu-item-2'
+                      id='user-menu-item-1'
                       onClick={() => {
                         setIsProfileMenuOpen(false);
                       }}
                     >
                       Saved Recipes
                     </Link>
+                    <div className='my-1 border-t border-purple-100' />
                     <button
                       onClick={() => {
                         setIsProfileMenuOpen(false);
                         signOut();
                       }}
-                      className='block px-4 py-2 text-sm text-gray-700'
+                      className='block w-full text-left px-4 py-2 text-sm text-slate-700 hover:bg-purple-50 hover:text-purple-800'
                       role='menuitem'
                       tabIndex='-1'
                       id='user-menu-item-2'
@@ -218,21 +227,14 @@ const Navbar = () => {
 
       {/* <!-- Mobile menu, show/hide based on menu state. --> */}
       {isMobileMenuOpen && (
-        <div id='mobile-menu'>
-          <div className='space-y-1 px-2 pb-3 pt-2'>
-            <Link
-              href='/'
-              className={`${
-                pathname === '/' ? 'bg-black' : ''
-              }  text-white block rounded-md px-3 py-2 text-base font-medium`}
-            >
+        <div id='mobile-menu' className='md:hidden border-t border-white/10'>
+          <div className='space-y-1 px-3 pb-4 pt-3'>
+            <Link href='/' className={mobileLinkClass(pathname === '/')}>
               Home
             </Link>
             <Link
               href='/recipes'
-              className={`${
-                pathname === '/recipes' ? 'bg-black' : ''
-              }  text-white block rounded-md px-3 py-2 text-base font-medium`}
+              className={mobileLinkClass(pathname === '/recipes')}
             >
               Recipes
             </Link>
@@ -240,9 +242,7 @@ const Navbar = () => {
             {session && (
               <Link
                 href='/recipes/add'
-                className={`${
-                  pathname === '/recipes/add' ? 'bg-black' : ''
-                }  text-white block rounded-md px-3 py-2 text-base font-medium`}
+                className={mobileLinkClass(pathname === '/recipes/add')}
               >
                 Add Recipe
               </Link>
@@ -251,9 +251,9 @@ const Navbar = () => {
             {status === 'unauthenticated' && (
               <button
                 onClick={() => signIn('google')}
-                className='flex items-center text-white bg-gray-700 hover:bg-gray-900 hover:text-white rounded-md px-3 py-2'
+                className='btn bg-white text-purple-800 hover:bg-purple-50 mt-2 w-full'
               >
-                <FaGoogle className='text-white mr-2' />
+                <FaGoogle />
                 <span>Login or Register</span>
               </button>
             )}
