@@ -8,8 +8,8 @@ Recipe-sharing app built with Next.js 16 (App Router, plain JavaScript/JSX), **S
 
 ```bash
 npm run dev       # dev server on http://localhost:9000 (port is fixed in package.json)
-npm run build     # production build (output: "standalone")
-npm start
+npm run build     # production build
+npm start         # production server on port 9000
 npm run lint      # eslint . (flat config in eslint.config.mjs; `next lint` no longer exists)
 npm run db:backup # online SQLite backup to data/backups (keeps 14)
 npm run db:migrate / db:verify   # one-off Mongo -> SQLite migration tooling (needs MONGODB_URI)
@@ -18,7 +18,8 @@ npm run db:migrate / db:verify   # one-off Mongo -> SQLite migration tooling (ne
 - There is no test suite. Verify changes with `npm run build`, and against the running dev server (e.g. `curl` the page). For data-layer changes, test against a **copy** of `data/recipes.db` (`SQLITE_PATH=<copy> node …`), never the real file.
 - `PageNotFoundError: Cannot find module for page: /_error` during `next build` means the `.next` cache is stale. Delete `.next` and rebuild. Don't do this while the user's dev server is running; build in a separate copy instead.
 - Configure through `.env` (template: `.env.example`). `SQLITE_PATH` defaults to `./data/recipes.db`. `data/` is git-ignored and must never be committed.
-- Node ≥ 22 (better-sqlite3 13). Docker: multi-stage `Dockerfile` (Node 22 Alpine, standalone `server.js`, port 9000, `VOLUME /app/data`). Always run it with `-v recipe-data:/app/data`. Deploy and backup notes are in `ReadMe.Docker.txt`. Production is **VPS only** (GHCR). Vercel isn't supported, because SQLite needs a persistent writable disk.
+- Node ≥ 22 (better-sqlite3 13). Production is **VPS only**: plain Node under systemd (`npm ci && npm run build && npm start`), with the DB at an absolute `SQLITE_PATH` outside the code folder. Deploy, backup and restore steps are in `DEPLOY.md`. Vercel isn't supported, because SQLite needs a persistent writable disk.
+- **This project doesn't use Docker, for any purpose.** Don't add a Dockerfile, a compose file, container-based scripts or docs, or Docker commands in instructions.
 
 ## Architecture
 
@@ -35,7 +36,7 @@ npm run db:migrate / db:verify   # one-off Mongo -> SQLite migration tooling (ne
 4. Return `{ error }` for failures (don't throw; production masks thrown messages), and a plain object on success. Form-input problems throw `FormValueError` (`utils/formValues.js`), which actions turn into `{ error: message }`.
 5. Call `revalidatePath(...)` after writing. `redirect()` throws, so call it after the `try/catch`, never inside.
 
-**better-sqlite3 is synchronous.** Transactions (`db.transaction(fn)()`) can't contain `await`. Do all async work first (e.g. `processImage`), then one transaction. `getDb()` must only be called inside functions, never at module load, so the build doesn't open the DB. The `turbopackIgnore` comment in `config/database.js` stops the build tracing `data/` into the standalone output; keep it.
+**better-sqlite3 is synchronous.** Transactions (`db.transaction(fn)()`) can't contain `await`. Do all async work first (e.g. `processImage`), then one transaction. `getDb()` must only be called inside functions, never at module load, so the build doesn't open the DB. The `turbopackIgnore` comment in `config/database.js` stops the build's file tracing from walking `data/`; keep it.
 
 Pages are all dynamic because the root layout is `force-dynamic`.
 
@@ -60,4 +61,4 @@ Pages are all dynamic because the root layout is `force-dynamic`.
 - **Keep `sharp` in package.json on the same version Next depends on** (`npm ls sharp` must show one copy, `deduped`). If two copies load in one server process (Next's image optimizer plus the app's `processImage`), their libvips builds clash and every upload fails with `colourspace: parameter space not set`. Re-check after every Next upgrade.
 - Search uses `LIKE … ESCAPE '\'` with user input escaped. Keep the escaping if you touch `models/recipes.search`.
 - `res.cloudinary.com` in `next.config.mjs` and `mongodb` in devDependencies remain only until decommission (`docs/SQLITE_MIGRATION.md` §6 step 11).
-- `ReadMe.Docker.txt` contains a committed GitHub token. Don't copy it anywhere.
+- A GitHub token was committed in the now-deleted `ReadMe.Docker.txt` and is still in git history. Don't copy it anywhere; it should be revoked.

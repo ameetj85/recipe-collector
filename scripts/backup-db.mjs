@@ -4,7 +4,7 @@
 //
 //   npm run db:backup -- [--db ./data/recipes.db] [--dir ./data/backups] [--keep 14]
 //
-// In Docker: docker exec <container> node scripts/backup-db.mjs --dir /app/data/backups
+// On the server (see DEPLOY.md): npm run db:backup -- --dir /var/backups/recipe-collector
 import fs from 'node:fs';
 import path from 'node:path';
 import { parseArgs } from 'node:util';

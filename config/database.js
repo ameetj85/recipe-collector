@@ -7,7 +7,7 @@ import Database from 'better-sqlite3';
 import { applyPragmas, ensureSchema } from '../db/schema.mjs';
 
 // turbopackIgnore: the path is only known at runtime; without the hint the
-// build traces the whole project (including data/) into .next/standalone.
+// build's file tracing walks the whole project (including data/).
 export const getDbPath = () =>
   path.resolve(
     /* turbopackIgnore: true */ process.env.SQLITE_PATH || './data/recipes.db'
